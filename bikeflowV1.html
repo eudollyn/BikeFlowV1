@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#020617">
+    <title>BikeFlow Ultra Pro | SaaS Edition</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --brand: #10b981;
+            --brand-glow: rgba(16, 185, 129, 0.2);
+            --bg-deep: #020617;
+            --border: rgba(255, 255, 255, 0.08);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-deep);
+            color: #f8fafc;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .font-title { font-family: 'Outfit', sans-serif; }
+
+        .bento-card {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .mode-switch {
+            background: #1e293b;
+            padding: 4px;
+            border-radius: 14px;
+            display: inline-flex;
+        }
+
+        .mode-switch button {
+            padding: 8px 18px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            transition: 0.3s;
+        }
+
+        .mode-switch button.active {
+            background: var(--brand);
+            color: var(--bg-deep);
+            box-shadow: 0 4px 15px var(--brand-glow);
+        }
+
+        .btn-primary {
+            background: var(--brand);
+            color: var(--bg-deep);
+            box-shadow: 0 8px 20px var(--brand-glow);
+        }
+
+        .view-content { animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        #quick-modal { backdrop-filter: blur(8px); z-index: 101; }
+        
+        .fab-container {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%) translateY(-24px);
+        }
+
+        /* Animação para o Timer Ativo */
+        .timer-active {
+            box-shadow: inset 0 0 20px rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.4);
+            animation: pulse-border 2s infinite;
+        }
+
+        @keyframes pulse-border {
+            0% { border-color: rgba(16, 185, 129, 0.4); }
+            50% { border-color: rgba(16, 185, 129, 0.8); }
+            100% { border-color: rgba(16, 185, 129, 0.4); }
+        }
+    </style>
+</head>
+<body class="pb-24 lg:pb-0 lg:pl-64 text-slate-200">
+
+    <!-- Sidebar Desktop -->
+    <aside class="hidden lg:flex fixed left-0 top-0 h-screen w-64 flex-col border-r border-white/5 bg-slate-950 p-6 z-50">
+        <div class="flex items-center gap-3 mb-10">
+            <div id="logo-icon" class="h-10 w-10 bg-emerald-500 rounded-xl flex items-center justify-center">
+                <i data-lucide="zap" class="text-slate-950 fill-current"></i>
+            </div>
+            <span class="text-2xl font-black font-title tracking-tight tracking-tighter">BIKE<span id="logo-text" class="text-emerald-500">FLOW</span></span>
+        </div>
+
+        <nav class="space-y-2 flex-1">
+            <button onclick="showView('dashboard')" id="nav-desktop-dashboard" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-emerald-500 bg-emerald-500/10 font-bold active-link transition">
+                <i data-lucide="layout-grid" size="20"></i> Dashboard
+            </button>
+            <button onclick="showView('history')" id="nav-desktop-history" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-white/5 transition">
+                <i data-lucide="database" size="20"></i> Histórico
+            </button>
+            <button onclick="showView('garage')" id="nav-desktop-garage" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-white/5 transition">
+                <i data-lucide="wrench" size="20"></i> Garagem
+            </button>
+            <button onclick="showView('profile')" id="nav-desktop-profile" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-white/5 transition">
+                <i data-lucide="user" size="20"></i> Minha Conta
+            </button>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="p-6 lg:p-10 max-w-7xl mx-auto">
+        
+        <!-- VIEW: DASHBOARD -->
+        <div id="view-dashboard" class="view-content space-y-8">
+            <header class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div>
+                    <h1 class="text-3xl font-black font-title lg:text-4xl uppercase tracking-tighter">Fluxo <span id="header-mode-name" class="text-emerald-500">Delivery</span></h1>
+                    <p class="text-slate-400">Controle total do seu turno.</p>
+                </div>
+                
+                <div class="mode-switch">
+                    <button id="btn-delivery" onclick="setMode('delivery')" class="active uppercase">Corre</button>
+                    <button id="btn-pedal" onclick="setMode('pedal')" class="uppercase">Pedal</button>
+                </div>
+            </header>
+
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bento-card p-6 relative overflow-hidden group">
+                    <div id="card-1-icon" class="absolute -right-4 -top-4 text-emerald-500/10 transition-transform group-hover:scale-110"><i data-lucide="dollar-sign" size="80"></i></div>
+                    <p id="card-1-label" class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">Ganhos</p>
+                    <h3 id="card-1-value" class="text-3xl font-black font-title tracking-tighter">R$ 0,00</h3>
+                    <p id="card-1-sub" class="text-emerald-500 text-xs mt-2 font-bold flex items-center gap-1"><i data-lucide="trending-up" size="14"></i> Somatória do dia</p>
+                </div>
+
+                <div class="bento-card p-6 relative overflow-hidden group">
+                    <div class="absolute -right-4 -top-4 text-blue-500/10 group-hover:scale-110"><i data-lucide="navigation" size="80"></i></div>
+                    <p class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">Distância</p>
+                    <h3 id="stat-km" class="text-3xl font-black font-title tracking-tighter">0.0 km</h3>
+                    <p class="text-slate-500 text-xs mt-2 font-medium tracking-tight">Acumulado</p>
+                </div>
+
+                <!-- TIMER CARD COM CONTROLE MANUAL -->
+                <div id="timer-card" class="bento-card p-6 relative overflow-hidden group border-slate-800 transition-all duration-500">
+                    <div class="flex justify-between items-start relative z-10">
+                        <div>
+                            <p id="timer-label" class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">Tempo de Turno</p>
+                            <h3 id="stat-time" class="text-3xl font-black font-title tracking-tighter tabular-nums">00:00:00</h3>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="resetTimer()" class="h-8 w-8 rounded-lg bg-white/5 flex items-center justify-center hover:bg-white/10 transition text-slate-400">
+                                <i data-lucide="rotate-ccw" size="16"></i>
+                            </button>
+                            <button onclick="toggleTimer()" id="btn-timer-toggle" class="h-10 w-10 rounded-xl btn-primary flex items-center justify-center transition-transform active:scale-90">
+                                <i data-lucide="play" id="timer-icon" class="text-slate-950 fill-current"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="timer-bg-icon" class="absolute -right-4 -top-4 text-slate-500/10 transition-transform group-hover:scale-110"><i data-lucide="timer" size="80"></i></div>
+                </div>
+
+                <div class="bento-card p-6 relative overflow-hidden group">
+                    <div id="card-4-icon" class="absolute -right-4 -top-4 text-purple-500/10 group-hover:scale-110"><i data-lucide="package" size="80"></i></div>
+                    <p id="card-4-label" class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">Pedidos</p>
+                    <h3 id="card-4-value" class="text-3xl font-black font-title tracking-tighter">0</h3>
+                    <p id="card-4-sub" class="text-slate-500 text-xs mt-2 font-medium">Finalizados</p>
+                </div>
+            </div>
+
+            <!-- Visual Analytics Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 bento-card p-8">
+                    <h3 class="font-bold text-lg mb-6 flex items-center gap-2 uppercase tracking-tight font-title"><i data-lucide="bar-chart-3" size="20"></i> Performance Semanal</h3>
+                    <div class="h-64"><canvas id="mainChart"></canvas></div>
+                </div>
+                <div class="bento-card p-8 flex flex-col justify-between">
+                    <div>
+                        <h3 class="font-bold text-lg mb-6 uppercase tracking-tight font-title">Progresso</h3>
+                        <div class="space-y-8" id="goals-container"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: HISTÓRICO -->
+        <div id="view-history" class="view-content hidden space-y-8">
+            <header>
+                <h1 class="text-3xl font-black font-title lg:text-4xl uppercase tracking-tighter tracking-tighter">Log de <span class="text-brand">Atividades</span></h1>
+                <p class="text-slate-400">Histórico completo de registros.</p>
+            </header>
+            <div class="space-y-4" id="history-list-container"></div>
+        </div>
+
+        <!-- VIEW: GARAGEM -->
+        <div id="view-garage" class="view-content hidden space-y-8">
+            <header>
+                <h1 class="text-3xl font-black font-title lg:text-4xl uppercase tracking-tighter tracking-tighter">Minha <span class="text-brand">Oficina</span></h1>
+                <p class="text-slate-400">Manutenção inteligente baseada no uso.</p>
+            </header>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="garage-health-cards"></div>
+        </div>
+
+        <!-- VIEW: PERFIL -->
+        <div id="view-profile" class="view-content hidden space-y-8 max-w-md mx-auto">
+            <div class="bento-card p-10 flex flex-col items-center text-center">
+                <div id="profile-avatar" class="h-28 w-28 rounded-3xl bg-slate-800 mb-6 flex items-center justify-center overflow-hidden border-2 border-brand/20 shadow-2xl">
+                    <i data-lucide="user" size="48" class="text-slate-600"></i>
+                </div>
+                <h2 id="profile-name" class="text-3xl font-black font-title uppercase tracking-tighter">Visitante</h2>
+                <p id="profile-email" class="text-slate-500 mb-10 italic">Local-only Mode</p>
+                
+                <button onclick="loginGoogle()" id="login-btn" class="w-full py-5 bg-white text-slate-950 font-black rounded-2xl flex items-center justify-center gap-3 hover:scale-[1.02] transition shadow-xl">
+                    <i data-lucide="log-in" size="22"></i> ENTRAR COM GOOGLE
+                </button>
+                <button id="logout-btn" onclick="handleLogout()" class="hidden w-full py-4 text-red-500 font-bold mt-4 uppercase tracking-widest text-xs">Desconectar</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Barra de Navegação Inferior -->
+    <nav class="lg:hidden fixed bottom-0 left-0 right-0 h-20 bg-slate-950/80 backdrop-blur-2xl border-t border-white/5 flex items-center justify-between px-6 z-50">
+        <div class="flex w-2/5 justify-around items-center">
+            <button onclick="showView('dashboard')" id="nav-mobile-dashboard" class="nav-btn transition-colors flex flex-col items-center gap-1"><i data-lucide="layout-grid"></i><span class="text-[8px] font-black uppercase">Home</span></button>
+            <button onclick="showView('history')" id="nav-mobile-history" class="nav-btn text-slate-500 transition-colors flex flex-col items-center gap-1"><i data-lucide="database"></i><span class="text-[8px] font-black uppercase">Logs</span></button>
+        </div>
+
+        <div class="fab-container">
+            <button onclick="openModal()" id="fab-button" class="h-16 w-16 btn-primary rounded-2xl rotate-45 flex items-center justify-center shadow-2xl transition-transform active:scale-90 border-4 border-slate-950">
+                <i data-lucide="plus" class="-rotate-45 text-slate-950" size="32"></i>
+            </button>
+        </div>
+
+        <div class="flex w-2/5 justify-around items-center">
+            <button onclick="showView('garage')" id="nav-mobile-garage" class="nav-btn text-slate-500 transition-colors flex flex-col items-center gap-1"><i data-lucide="wrench"></i><span class="text-[8px] font-black uppercase">Bike</span></button>
+            <button onclick="showView('profile')" id="nav-mobile-profile" class="nav-btn text-slate-500 transition-colors flex flex-col items-center gap-1"><i data-lucide="user"></i><span class="text-[8px] font-black uppercase">Conta</span></button>
+        </div>
+    </nav>
+
+    <!-- Modal Registro -->
+    <div id="quick-modal" class="fixed inset-0 bg-slate-950/80 hidden flex items-center justify-center p-4">
+        <div class="bento-card w-full max-w-lg p-8 space-y-6">
+            <div class="flex justify-between items-center"><h2 class="text-2xl font-black font-title uppercase" id="modal-title">Novo Registro</h2><button onclick="closeModal()" class="text-slate-500"><i data-lucide="x"></i></button></div>
+            <form id="activity-form" class="space-y-4">
+                <div id="delivery-fields" class="grid grid-cols-2 gap-4">
+                    <div class="col-span-2"><label class="text-[10px] font-black text-slate-500 uppercase">Ganhos (R$)</label><input type="number" step="0.01" id="input-val" class="w-full bg-slate-800 border-none rounded-xl p-4 mt-1 font-bold outline-none focus:ring-2 focus:ring-emerald-500"></div>
+                    <div><label class="text-[10px] font-black text-slate-500 uppercase">Gorjeta</label><input type="number" step="0.01" id="input-tip" class="w-full bg-slate-800 border-none rounded-xl p-4 mt-1 font-bold"></div>
+                    <div><label class="text-[10px] font-black text-slate-500 uppercase">Plataforma</label><select id="input-platform" class="w-full bg-slate-800 border-none rounded-xl p-4 mt-1 font-bold"><option>iFood</option><option>Particular</option></select></div>
+                </div>
+                <div id="pedal-fields" class="grid grid-cols-2 gap-4 hidden">
+                    <div class="col-span-2"><label class="text-[10px] font-black text-slate-500 uppercase">Elevação (m)</label><input type="number" id="input-elev" class="w-full bg-slate-800 border-none rounded-xl p-4 mt-1 font-bold"></div>
+                    <div class="col-span-2"><label class="text-[10px] font-black text-slate-500 uppercase">Tipo</label><select id="input-pedal-type" class="w-full bg-slate-800 border-none rounded-xl p-4 mt-1 font-bold"><option>Urbano</option><option>MTB</option></select></div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="text-[10px] font-black text-slate-500 uppercase">KM</label><input type="number" step="0.1" id="input-km" class="w-full bg-slate-800 border-none rounded-xl p-4 mt-1 font-bold"></div>
+                    <div><label class="text-[10px] font-black text-slate-500 uppercase">Minutos</label><input type="number" id="input-dur" class="w-full bg-slate-800 border-none rounded-xl p-4 mt-1 font-bold"></div>
+                </div>
+                <button type="submit" class="w-full py-5 rounded-2xl font-black font-title uppercase btn-primary tracking-widest transition-all">Registrar Agora</button>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDZai14RIMoOhHi3mMrwyVGc6TZsaZPmws",
+            authDomain: "bikeflow-b5564.firebaseapp.com",
+            projectId: "bikeflow-b5564",
+            storageBucket: "bikeflow-b5564.firebasestorage.app",
+            messagingSenderId: "11176109310",
+            appId: "1:11176109310:web:3b6a70b55c2629274c31af",
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
+
+        let currentMode = 'delivery';
+        let activities = [];
+        let mainChart = null;
+
+        // ESTADO DO TIMER
+        let isTimerRunning = false;
+        let startTime = 0;
+        let elapsedTime = 0;
+        let timerInterval = null;
+
+        // TIMER LOGIC
+        window.toggleTimer = () => {
+            if (!isTimerRunning) {
+                // START
+                isTimerRunning = true;
+                startTime = Date.now() - elapsedTime;
+                timerInterval = setInterval(updateTimerDisplay, 1000);
+                
+                document.getElementById('timer-card').classList.add('timer-active');
+                document.getElementById('timer-icon').setAttribute('data-lucide', 'pause');
+                document.getElementById('timer-bg-icon').classList.add('text-emerald-500/20');
+                document.getElementById('timer-label').innerText = "Turno Ativo";
+            } else {
+                // PAUSE
+                isTimerRunning = false;
+                clearInterval(timerInterval);
+                elapsedTime = Date.now() - startTime;
+                
+                document.getElementById('timer-card').classList.remove('timer-active');
+                document.getElementById('timer-icon').setAttribute('data-lucide', 'play');
+                document.getElementById('timer-bg-icon').classList.remove('text-emerald-500/20');
+                document.getElementById('timer-label').innerText = "Turno Pausado";
+            }
+            lucide.createIcons();
+        };
+
+        window.resetTimer = () => {
+            if(confirm("Deseja zerar o tempo do turno atual?")) {
+                clearInterval(timerInterval);
+                isTimerRunning = false;
+                elapsedTime = 0;
+                document.getElementById('stat-time').innerText = "00:00:00";
+                document.getElementById('timer-card').classList.remove('timer-active');
+                document.getElementById('timer-icon').setAttribute('data-lucide', 'play');
+                document.getElementById('timer-label').innerText = "Turno Zerado";
+                lucide.createIcons();
+            }
+        };
+
+        function updateTimerDisplay() {
+            const now = Date.now();
+            const diff = now - startTime;
+            const h = Math.floor(diff / 3600000).toString().padStart(2, '0');
+            const m = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
+            const s = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
+            document.getElementById('stat-time').innerText = `${h}:${m}:${s}`;
+        }
+
+        // NAVIGATION
+        window.showView = (viewName) => {
+            document.querySelectorAll('.view-content').forEach(v => v.classList.add('hidden'));
+            document.getElementById(`view-${viewName}`).classList.remove('hidden');
+            
+            document.querySelectorAll('.nav-btn, .nav-link').forEach(btn => {
+                btn.classList.remove('text-emerald-500', 'text-blue-500', 'active', 'bg-emerald-500/10', 'bg-blue-500/10', 'font-bold');
+                btn.classList.add('text-slate-500');
+            });
+
+            const colorClass = currentMode === 'delivery' ? 'text-emerald-500' : 'text-blue-500';
+            const bgClass = currentMode === 'delivery' ? 'bg-emerald-500/10' : 'bg-blue-500/10';
+
+            const mob = document.getElementById(`nav-mobile-${viewName}`);
+            if(mob) { mob.classList.add(colorClass, 'active'); mob.classList.remove('text-slate-500'); }
+            
+            const desk = document.getElementById(`nav-desktop-${viewName}`);
+            if(desk) { desk.classList.add(colorClass, bgClass, 'font-bold'); desk.classList.remove('text-slate-500'); }
+
+            if(viewName === 'history') renderHistory();
+            lucide.createIcons();
+        };
+
+        // AUTH & SYNC
+        window.loginGoogle = async () => await signInWithPopup(auth, provider);
+        window.handleLogout = () => signOut(auth);
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                document.getElementById('login-btn').classList.add('hidden');
+                document.getElementById('logout-btn').classList.remove('hidden');
+                document.getElementById('profile-name').innerText = user.displayName;
+                document.getElementById('profile-email').innerText = user.email;
+                document.getElementById('profile-avatar').innerHTML = `<img src="${user.photoURL}" class="h-full w-full object-cover">`;
+                syncData(user.uid);
+            } else {
+                document.getElementById('login-btn').classList.remove('hidden');
+                document.getElementById('logout-btn').classList.add('hidden');
+                document.getElementById('profile-name').innerText = "Visitante";
+                document.getElementById('profile-email').innerText = "Local-only Mode";
+                document.getElementById('profile-avatar').innerHTML = `<i data-lucide="user" size="40" class="text-slate-600"></i>`;
+                lucide.createIcons();
+            }
+        });
+
+        function syncData(uid) {
+            const q = query(collection(db, `users/${uid}/activities`), orderBy("timestamp", "desc"));
+            onSnapshot(q, (snapshot) => {
+                activities = snapshot.docs.map(doc => doc.data());
+                updateDashboard();
+                renderGarage();
+            });
+        }
+
+        window.setMode = (mode) => {
+            currentMode = mode;
+            document.querySelectorAll('.mode-switch button').forEach(b => b.classList.remove('active'));
+            document.getElementById(`btn-${mode}`).classList.add('active');
+            
+            const isDel = mode === 'delivery';
+            const color = isDel ? '#10b981' : '#3b82f6';
+            document.documentElement.style.setProperty('--brand', color);
+            
+            document.getElementById('header-mode-name').innerText = isDel ? 'Delivery' : 'Pedal';
+            document.getElementById('header-mode-name').className = isDel ? 'text-emerald-500' : 'text-blue-500';
+            
+            updateDashboard();
+            renderGoals();
+            lucide.createIcons();
+        };
+
+        function updateDashboard() {
+            const filtered = activities.filter(a => a.mode === currentMode);
+            const km = filtered.reduce((acc, curr) => acc + (curr.km || 0), 0);
+            document.getElementById('stat-km').innerText = `${km.toFixed(1)} km`;
+
+            if (currentMode === 'delivery') {
+                const val = filtered.reduce((acc, curr) => acc + (curr.value || 0), 0);
+                const tip = filtered.reduce((acc, curr) => acc + (curr.tip || 0), 0);
+                document.getElementById('card-1-label').innerText = "Ganhos";
+                document.getElementById('card-1-value').innerText = `R$ ${(val + tip).toFixed(2)}`;
+                document.getElementById('card-4-label').innerText = "Pedidos";
+                document.getElementById('card-4-value').innerText = filtered.length;
+            } else {
+                const elev = filtered.reduce((acc, curr) => acc + (curr.elevation || 0), 0);
+                document.getElementById('card-1-label').innerText = "Elevação";
+                document.getElementById('card-1-value').innerText = `${elev}m`;
+                document.getElementById('card-4-label').innerText = "Sessões";
+                document.getElementById('card-4-value').innerText = filtered.length;
+            }
+            updateChart();
+        }
+
+        function renderHistory() {
+            const container = document.getElementById('history-list-container');
+            const filtered = activities.filter(a => a.mode === currentMode);
+            if(filtered.length === 0) { container.innerHTML = '<p class="p-10 text-center text-slate-500">Sem atividades registradas.</p>'; return; }
+            container.innerHTML = filtered.map(a => `
+                <div class="bento-card p-6 flex justify-between items-center transition hover:border-white/10 group">
+                    <div class="flex items-center gap-5">
+                        <div class="h-14 w-14 rounded-2xl bg-slate-800 flex items-center justify-center text-${currentMode === 'delivery' ? 'emerald' : 'blue'}-500 group-hover:scale-110 transition">
+                            <i data-lucide="${currentMode === 'delivery' ? 'package' : 'zap'}"></i>
+                        </div>
+                        <div>
+                            <p class="font-black font-title text-lg mb-1 leading-none">${currentMode === 'delivery' ? 'R$ '+ (a.value + a.tip).toFixed(2) : a.elevation + 'm'}</p>
+                            <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest">${new Date(a.timestamp).toLocaleDateString()} • ${a.km}km • ${a.duration}min</p>
+                        </div>
+                    </div>
+                    <i data-lucide="chevron-right" class="text-slate-700"></i>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function renderGarage() {
+            const km = activities.reduce((acc, curr) => acc + (curr.km || 0), 0);
+            const comps = [{ n: 'Corrente', l: 1000, c: 'emerald' }, { n: 'Freios', l: 1500, c: 'yellow' }, { n: 'Pneus', l: 3000, c: 'blue' }];
+            document.getElementById('garage-health-cards').innerHTML = comps.map(c => {
+                const wear = Math.max(0, 100 - (km/c.l*100));
+                return `<div class="bento-card p-6 flex flex-col items-center"><span class="text-2xl font-black mb-2">${Math.round(wear)}%</span><h4 class="text-[10px] font-black uppercase text-slate-500 tracking-widest">${c.n}</h4><div class="w-full bg-slate-800 h-1 mt-4 rounded-full"><div class="bg-${c.c}-500 h-full" style="width: ${wear}%"></div></div></div>`;
+            }).join('');
+        }
+
+        // MODAL
+        window.openModal = () => {
+            document.getElementById('quick-modal').classList.remove('hidden');
+            const isD = currentMode === 'delivery';
+            document.getElementById('delivery-fields').classList.toggle('hidden', !isD);
+            document.getElementById('pedal-fields').classList.toggle('hidden', isD);
+        };
+        window.closeModal = () => document.getElementById('quick-modal').classList.add('hidden');
+
+        document.getElementById('activity-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if(!auth.currentUser) return alert("Logue com Google!");
+            const base = { mode: currentMode, km: parseFloat(document.getElementById('input-km').value) || 0, duration: parseFloat(document.getElementById('input-dur').value) || 0, timestamp: Date.now() };
+            const extra = currentMode === 'delivery' ? { value: parseFloat(document.getElementById('input-val').value) || 0, tip: parseFloat(document.getElementById('input-tip').value) || 0, platform: document.getElementById('input-platform').value } : { elevation: parseFloat(document.getElementById('input-elev').value) || 0, type: document.getElementById('input-pedal-type').value };
+            await addDoc(collection(db, `users/${auth.currentUser.uid}/activities`), {...base, ...extra});
+            closeModal();
+            e.target.reset();
+        });
+
+        function updateChart() {
+            const ctx = document.getElementById('mainChart').getContext('2d');
+            if(mainChart) mainChart.destroy();
+            mainChart = new Chart(ctx, {
+                type: 'bar',
+                data: { labels: ['S', 'T', 'Q', 'Q', 'S', 'S', 'D'], datasets: [{ label: 'Atividade', data: [5, 15, 10, 25, 30, 20, 35], backgroundColor: currentMode === 'delivery' ? '#10b981' : '#3b82f6', borderRadius: 8 }] },
+                options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false }, ticks: { color: '#475569' } } } }
+            });
+        }
+
+        window.renderGoals = () => {
+            const container = document.getElementById('goals-container');
+            const target = currentMode === 'delivery' ? 150 : 120;
+            const current = currentMode === 'delivery' ? 45 : 30; // Simulado
+            const pct = Math.min(100, (current/target)*100);
+            container.innerHTML = `<div><div class="flex justify-between text-[10px] font-black mb-2 uppercase text-slate-500 tracking-widest">${currentMode === 'delivery' ? 'Meta Dinheiro' : 'Meta KM'}</div><div class="h-2.5 bg-slate-800 rounded-full overflow-hidden"><div class="h-full ${currentMode === 'delivery' ? 'bg-emerald-500' : 'bg-blue-500'}" style="width: ${pct}%"></div></div><div class="flex justify-between mt-3 text-xs font-black italic"><span>${currentMode === 'delivery' ? 'R$ '+current : current+' KM'}</span><span class="text-slate-500">${currentMode === 'delivery' ? 'R$ '+target : target+' KM'}</span></div></div>`;
+        };
+
+        window.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            setMode('delivery');
+            showView('dashboard');
+        });
+    </script>
+</body>
+</html>
