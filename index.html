@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#020617">
-    <title>BikeFlow Ultra Pro | SaaS Edition</title>
+    <title>BikeFlow OS | Elite Performance</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
@@ -37,27 +37,6 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .mode-switch {
-            background: #1e293b;
-            padding: 4px;
-            border-radius: 14px;
-            display: inline-flex;
-        }
-
-        .mode-switch button {
-            padding: 8px 18px;
-            border-radius: 10px;
-            font-weight: 700;
-            font-size: 0.8rem;
-            transition: 0.3s;
-        }
-
-        .mode-switch button.active {
-            background: var(--brand);
-            color: var(--bg-deep);
-            box-shadow: 0 4px 15px var(--brand-glow);
-        }
-
         .btn-primary {
             background: var(--brand);
             color: var(--bg-deep);
@@ -67,37 +46,46 @@
         .view-content { animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        #quick-modal { backdrop-filter: blur(8px); z-index: 101; }
-        
         .fab-container {
             position: absolute;
             left: 50%;
             transform: translateX(-50%) translateY(-24px);
         }
 
-        /* Animação para o Timer Ativo */
         .timer-active {
-            box-shadow: inset 0 0 20px rgba(16, 185, 129, 0.1);
-            border-color: rgba(16, 185, 129, 0.4);
-            animation: pulse-border 2s infinite;
+            border-color: var(--brand);
+            animation: pulse-glow 2s infinite;
         }
 
-        @keyframes pulse-border {
-            0% { border-color: rgba(16, 185, 129, 0.4); }
-            50% { border-color: rgba(16, 185, 129, 0.8); }
-            100% { border-color: rgba(16, 185, 129, 0.4); }
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 5px var(--brand-glow); }
+            50% { box-shadow: 0 0 20px var(--brand-glow); }
+            100% { box-shadow: 0 0 5px var(--brand-glow); }
         }
+
+        /* Estilo para inputs de meta */
+        .goal-input {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 8px 12px;
+            width: 100%;
+            font-weight: bold;
+            color: white;
+            outline: none;
+        }
+        .goal-input:focus { border-color: var(--brand); }
     </style>
 </head>
-<body class="pb-24 lg:pb-0 lg:pl-64 text-slate-200">
+<body class="pb-28 lg:pb-0 lg:pl-64 text-slate-200">
 
     <!-- Sidebar Desktop -->
     <aside class="hidden lg:flex fixed left-0 top-0 h-screen w-64 flex-col border-r border-white/5 bg-slate-950 p-6 z-50">
         <div class="flex items-center gap-3 mb-10">
-            <div id="logo-icon" class="h-10 w-10 bg-emerald-500 rounded-xl flex items-center justify-center">
+            <div class="h-10 w-10 bg-emerald-500 rounded-xl flex items-center justify-center">
                 <i data-lucide="zap" class="text-slate-950 fill-current"></i>
             </div>
-            <span class="text-2xl font-black font-title tracking-tight tracking-tighter">BIKE<span id="logo-text" class="text-emerald-500">FLOW</span></span>
+            <span class="text-2xl font-black font-title tracking-tighter">BIKE<span class="text-emerald-500">FLOW</span></span>
         </div>
 
         <nav class="space-y-2 flex-1">
@@ -107,11 +95,14 @@
             <button onclick="showView('history')" id="nav-desktop-history" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-white/5 transition">
                 <i data-lucide="database" size="20"></i> Histórico
             </button>
+            <button onclick="showView('health')" id="nav-desktop-health" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-white/5 transition">
+                <i data-lucide="heart-pulse" size="20"></i> Rider Health
+            </button>
             <button onclick="showView('garage')" id="nav-desktop-garage" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-white/5 transition">
-                <i data-lucide="wrench" size="20"></i> Garagem
+                <i data-lucide="wrench" size="20"></i> Oficina
             </button>
             <button onclick="showView('profile')" id="nav-desktop-profile" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-white/5 transition">
-                <i data-lucide="user" size="20"></i> Minha Conta
+                <i data-lucide="settings" size="20"></i> Ajustes
             </button>
         </nav>
     </aside>
@@ -120,166 +111,204 @@
     <main class="p-6 lg:p-10 max-w-7xl mx-auto">
         
         <!-- VIEW: DASHBOARD -->
-        <div id="view-dashboard" class="view-content space-y-8">
-            <header class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div id="view-dashboard" class="view-content space-y-6">
+            <header class="flex justify-between items-center">
                 <div>
-                    <h1 class="text-3xl font-black font-title lg:text-4xl uppercase tracking-tighter">Fluxo <span id="header-mode-name" class="text-emerald-500">Delivery</span></h1>
-                    <p class="text-slate-400">Controle total do seu turno.</p>
+                    <h1 class="text-2xl font-black font-title uppercase tracking-tighter">Painel de <span id="header-mode-name" class="text-emerald-500">Controle</span></h1>
+                    <p class="text-xs text-slate-500" id="sync-status">Sincronizando com o novo Firebase...</p>
                 </div>
-                
-                <div class="mode-switch">
-                    <button id="btn-delivery" onclick="setMode('delivery')" class="active uppercase">Corre</button>
-                    <button id="btn-pedal" onclick="setMode('pedal')" class="uppercase">Pedal</button>
+                <div class="flex gap-2">
+                    <button onclick="addWater()" class="h-10 w-10 rounded-xl bg-blue-500/20 text-blue-500 flex items-center justify-center border border-blue-500/30">
+                        <i data-lucide="droplets" size="18"></i>
+                    </button>
+                    <div class="h-10 w-10 rounded-xl bg-slate-800 flex items-center justify-center border border-white/5" id="user-initial">
+                        <i data-lucide="user" size="18"></i>
+                    </div>
                 </div>
             </header>
 
-            <!-- Stats Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div class="bento-card p-6 relative overflow-hidden group">
-                    <div id="card-1-icon" class="absolute -right-4 -top-4 text-emerald-500/10 transition-transform group-hover:scale-110"><i data-lucide="dollar-sign" size="80"></i></div>
-                    <p id="card-1-label" class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">Ganhos</p>
-                    <h3 id="card-1-value" class="text-3xl font-black font-title tracking-tighter">R$ 0,00</h3>
-                    <p id="card-1-sub" class="text-emerald-500 text-xs mt-2 font-bold flex items-center gap-1"><i data-lucide="trending-up" size="14"></i> Somatória do dia</p>
-                </div>
+            <!-- Modo Switch -->
+            <div class="flex bg-slate-900 p-1 rounded-2xl w-full border border-white/5">
+                <button onclick="setMode('delivery')" id="btn-delivery" class="flex-1 py-3 rounded-xl text-xs font-black uppercase transition-all">Delivery</button>
+                <button onclick="setMode('pedal')" id="btn-pedal" class="flex-1 py-3 rounded-xl text-xs font-black uppercase transition-all">Pedal</button>
+            </div>
 
-                <div class="bento-card p-6 relative overflow-hidden group">
-                    <div class="absolute -right-4 -top-4 text-blue-500/10 group-hover:scale-110"><i data-lucide="navigation" size="80"></i></div>
-                    <p class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">Distância</p>
-                    <h3 id="stat-km" class="text-3xl font-black font-title tracking-tighter">0.0 km</h3>
-                    <p class="text-slate-500 text-xs mt-2 font-medium tracking-tight">Acumulado</p>
+            <!-- Stats Bento -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bento-card p-5">
+                    <p class="text-[10px] font-black text-slate-500 uppercase mb-1" id="label-primary">Ganhos</p>
+                    <h2 class="text-2xl font-black font-title tracking-tight" id="val-primary">R$ 0,00</h2>
                 </div>
-
-                <!-- TIMER CARD COM CONTROLE MANUAL -->
-                <div id="timer-card" class="bento-card p-6 relative overflow-hidden group border-slate-800 transition-all duration-500">
-                    <div class="flex justify-between items-start relative z-10">
-                        <div>
-                            <p id="timer-label" class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">Tempo de Turno</p>
-                            <h3 id="stat-time" class="text-3xl font-black font-title tracking-tighter tabular-nums">00:00:00</h3>
-                        </div>
-                        <div class="flex gap-2">
-                            <button onclick="resetTimer()" class="h-8 w-8 rounded-lg bg-white/5 flex items-center justify-center hover:bg-white/10 transition text-slate-400">
-                                <i data-lucide="rotate-ccw" size="16"></i>
-                            </button>
-                            <button onclick="toggleTimer()" id="btn-timer-toggle" class="h-10 w-10 rounded-xl btn-primary flex items-center justify-center transition-transform active:scale-90">
-                                <i data-lucide="play" id="timer-icon" class="text-slate-950 fill-current"></i>
-                            </button>
-                        </div>
+                <div class="bento-card p-5">
+                    <p class="text-[10px] font-black text-slate-500 uppercase mb-1">Distância</p>
+                    <h2 class="text-2xl font-black font-title tracking-tight" id="val-km">0.0 km</h2>
+                </div>
+                <div class="bento-card p-5" id="timer-card">
+                    <div class="flex justify-between items-start">
+                        <p class="text-[10px] font-black text-slate-500 uppercase mb-1">Turno</p>
+                        <button onclick="toggleTimer()" id="btn-timer" class="text-emerald-500"><i data-lucide="play" size="14"></i></button>
                     </div>
-                    <div id="timer-bg-icon" class="absolute -right-4 -top-4 text-slate-500/10 transition-transform group-hover:scale-110"><i data-lucide="timer" size="80"></i></div>
+                    <h2 class="text-2xl font-black font-title tracking-tight tabular-nums" id="val-time">00:00</h2>
                 </div>
-
-                <div class="bento-card p-6 relative overflow-hidden group">
-                    <div id="card-4-icon" class="absolute -right-4 -top-4 text-purple-500/10 group-hover:scale-110"><i data-lucide="package" size="80"></i></div>
-                    <p id="card-4-label" class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">Pedidos</p>
-                    <h3 id="card-4-value" class="text-3xl font-black font-title tracking-tighter">0</h3>
-                    <p id="card-4-sub" class="text-slate-500 text-xs mt-2 font-medium">Finalizados</p>
+                <div class="bento-card p-5">
+                    <p class="text-[10px] font-black text-slate-500 uppercase mb-1" id="label-secondary">Pedidos</p>
+                    <h2 class="text-2xl font-black font-title tracking-tight" id="val-secondary">0</h2>
                 </div>
             </div>
 
-            <!-- Visual Analytics Section -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div class="lg:col-span-2 bento-card p-8">
-                    <h3 class="font-bold text-lg mb-6 flex items-center gap-2 uppercase tracking-tight font-title"><i data-lucide="bar-chart-3" size="20"></i> Performance Semanal</h3>
-                    <div class="h-64"><canvas id="mainChart"></canvas></div>
+            <!-- Metas e Saúde Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Metas Dinâmicas -->
+                <div class="bento-card p-6 space-y-6">
+                    <h3 class="font-black text-sm uppercase tracking-widest text-slate-400 flex items-center gap-2">
+                        <i data-lucide="target" size="16"></i> Objetivos do Dia
+                    </h3>
+                    <div class="space-y-4" id="goals-list">
+                        <!-- JS Render -->
+                    </div>
                 </div>
-                <div class="bento-card p-8 flex flex-col justify-between">
-                    <div>
-                        <h3 class="font-bold text-lg mb-6 uppercase tracking-tight font-title">Progresso</h3>
-                        <div class="space-y-8" id="goals-container"></div>
+
+                <!-- Rider Health & Alerts -->
+                <div class="bento-card p-6 space-y-4">
+                    <h3 class="font-black text-sm uppercase tracking-widest text-slate-400 flex items-center gap-2">
+                        <i data-lucide="activity" size="16"></i> Rider Health
+                    </h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="p-4 bg-blue-500/5 rounded-2xl border border-blue-500/10">
+                            <p class="text-[10px] font-black text-blue-500 uppercase mb-1">Hidratação</p>
+                            <h4 class="text-xl font-black" id="val-water">0ml</h4>
+                            <div class="w-full bg-slate-800 h-1 mt-2 rounded-full overflow-hidden">
+                                <div id="bar-water" class="bg-blue-500 h-full w-[0%]"></div>
+                            </div>
+                        </div>
+                        <div class="p-4 bg-orange-500/5 rounded-2xl border border-orange-500/10">
+                            <p class="text-[10px] font-black text-orange-500 uppercase mb-1">Próxima Pausa</p>
+                            <h4 class="text-xl font-black" id="val-rest">--:--</h4>
+                            <p class="text-[8px] text-slate-500 mt-1 uppercase font-bold" id="rest-alert">Sistema de fadiga inativo</p>
+                        </div>
+                    </div>
+                    <div class="p-4 rounded-2xl bg-slate-800/50 border border-white/5 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <i data-lucide="coffee" class="text-slate-500"></i>
+                            <span class="text-xs font-bold text-slate-400">Pausar para alimentação?</span>
+                        </div>
+                        <button onclick="logBreak('Comida')" class="px-4 py-2 bg-slate-700 rounded-lg text-[10px] font-black uppercase">Registrar</button>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- VIEW: HISTÓRICO -->
-        <div id="view-history" class="view-content hidden space-y-8">
-            <header>
-                <h1 class="text-3xl font-black font-title lg:text-4xl uppercase tracking-tighter tracking-tighter">Log de <span class="text-brand">Atividades</span></h1>
-                <p class="text-slate-400">Histórico completo de registros.</p>
-            </header>
-            <div class="space-y-4" id="history-list-container"></div>
+        <div id="view-history" class="view-content hidden space-y-6">
+            <h1 class="text-2xl font-black font-title uppercase tracking-tighter">Linha do <span class="text-emerald-500">Tempo</span></h1>
+            <div id="history-container" class="space-y-4"></div>
         </div>
 
         <!-- VIEW: GARAGEM -->
-        <div id="view-garage" class="view-content hidden space-y-8">
-            <header>
-                <h1 class="text-3xl font-black font-title lg:text-4xl uppercase tracking-tighter tracking-tighter">Minha <span class="text-brand">Oficina</span></h1>
-                <p class="text-slate-400">Manutenção inteligente baseada no uso.</p>
-            </header>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="garage-health-cards"></div>
+        <div id="view-garage" class="view-content hidden space-y-6 text-center">
+            <i data-lucide="wrench" size="48" class="mx-auto text-slate-700"></i>
+            <h1 class="text-xl font-black uppercase">Oficina em breve</h1>
         </div>
 
-        <!-- VIEW: PERFIL -->
-        <div id="view-profile" class="view-content hidden space-y-8 max-w-md mx-auto">
-            <div class="bento-card p-10 flex flex-col items-center text-center">
-                <div id="profile-avatar" class="h-28 w-28 rounded-3xl bg-slate-800 mb-6 flex items-center justify-center overflow-hidden border-2 border-brand/20 shadow-2xl">
-                    <i data-lucide="user" size="48" class="text-slate-600"></i>
+        <!-- VIEW: CONFIGURAÇÕES -->
+        <div id="view-profile" class="view-content hidden space-y-8">
+            <h1 class="text-2xl font-black font-title uppercase tracking-tighter">Ajustes e <span class="text-emerald-500">Metas</span></h1>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Perfil -->
+                <div class="bento-card p-8 text-center">
+                    <div id="profile-pic" class="h-20 w-20 bg-slate-800 rounded-full mx-auto mb-4 border-2 border-brand"></div>
+                    <h2 id="profile-name" class="font-black text-xl">Rider Visitante</h2>
+                    <button onclick="loginGoogle()" id="btn-login" class="mt-6 w-full py-4 bg-white text-black font-black rounded-2xl">LOGAR COM GOOGLE</button>
+                    <button onclick="logout()" id="btn-logout" class="hidden mt-6 w-full py-4 bg-red-500/10 text-red-500 font-black rounded-2xl border border-red-500/20">SAIR</button>
                 </div>
-                <h2 id="profile-name" class="text-3xl font-black font-title uppercase tracking-tighter">Visitante</h2>
-                <p id="profile-email" class="text-slate-500 mb-10 italic">Local-only Mode</p>
-                
-                <button onclick="loginGoogle()" id="login-btn" class="w-full py-5 bg-white text-slate-950 font-black rounded-2xl flex items-center justify-center gap-3 hover:scale-[1.02] transition shadow-xl">
-                    <i data-lucide="log-in" size="22"></i> ENTRAR COM GOOGLE
-                </button>
-                <button id="logout-btn" onclick="handleLogout()" class="hidden w-full py-4 text-red-500 font-bold mt-4 uppercase tracking-widest text-xs">Desconectar</button>
+
+                <!-- Metas Diárias -->
+                <div class="bento-card p-8 space-y-4">
+                    <h3 class="font-black uppercase text-xs tracking-widest text-slate-500">Definir Metas Diárias</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-[10px] font-black uppercase text-slate-500">R$ Ganhos</label>
+                            <input type="number" id="goal-money-val" class="goal-input" placeholder="150">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-black uppercase text-slate-500">KM Pedal</label>
+                            <input type="number" id="goal-km-val" class="goal-input" placeholder="40">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-black uppercase text-slate-500">Água (ml)</label>
+                            <input type="number" id="goal-water-val" class="goal-input" placeholder="3000">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-black uppercase text-slate-500">Horas Turno</label>
+                            <input type="number" id="goal-hours-val" class="goal-input" placeholder="8">
+                        </div>
+                    </div>
+                    <button onclick="saveGoals()" class="w-full py-4 btn-primary rounded-2xl font-black uppercase tracking-widest mt-4">Salvar Metas</button>
+                </div>
             </div>
         </div>
     </main>
 
-    <!-- Barra de Navegação Inferior -->
-    <nav class="lg:hidden fixed bottom-0 left-0 right-0 h-20 bg-slate-950/80 backdrop-blur-2xl border-t border-white/5 flex items-center justify-between px-6 z-50">
+    <!-- Barra Inferior -->
+    <nav class="lg:hidden fixed bottom-0 left-0 right-0 h-20 bg-slate-950/80 backdrop-blur-xl border-t border-white/5 flex items-center justify-between px-6 z-50">
         <div class="flex w-2/5 justify-around items-center">
-            <button onclick="showView('dashboard')" id="nav-mobile-dashboard" class="nav-btn transition-colors flex flex-col items-center gap-1"><i data-lucide="layout-grid"></i><span class="text-[8px] font-black uppercase">Home</span></button>
-            <button onclick="showView('history')" id="nav-mobile-history" class="nav-btn text-slate-500 transition-colors flex flex-col items-center gap-1"><i data-lucide="database"></i><span class="text-[8px] font-black uppercase">Logs</span></button>
+            <button onclick="showView('dashboard')" class="nav-btn text-emerald-500 flex flex-col items-center gap-1"><i data-lucide="layout-grid"></i><span class="text-[8px] font-bold">Home</span></button>
+            <button onclick="showView('history')" class="nav-btn text-slate-500 flex flex-col items-center gap-1"><i data-lucide="database"></i><span class="text-[8px] font-bold">Logs</span></button>
         </div>
 
         <div class="fab-container">
-            <button onclick="openModal()" id="fab-button" class="h-16 w-16 btn-primary rounded-2xl rotate-45 flex items-center justify-center shadow-2xl transition-transform active:scale-90 border-4 border-slate-950">
+            <button onclick="openModal()" class="h-16 w-16 btn-primary rounded-2xl rotate-45 flex items-center justify-center shadow-2xl border-4 border-slate-950">
                 <i data-lucide="plus" class="-rotate-45 text-slate-950" size="32"></i>
             </button>
         </div>
 
         <div class="flex w-2/5 justify-around items-center">
-            <button onclick="showView('garage')" id="nav-mobile-garage" class="nav-btn text-slate-500 transition-colors flex flex-col items-center gap-1"><i data-lucide="wrench"></i><span class="text-[8px] font-black uppercase">Bike</span></button>
-            <button onclick="showView('profile')" id="nav-mobile-profile" class="nav-btn text-slate-500 transition-colors flex flex-col items-center gap-1"><i data-lucide="user"></i><span class="text-[8px] font-black uppercase">Conta</span></button>
+            <button onclick="showView('health')" class="nav-btn text-slate-500 flex flex-col items-center gap-1"><i data-lucide="heart-pulse"></i><span class="text-[8px] font-bold">Saúde</span></button>
+            <button onclick="showView('profile')" class="nav-btn text-slate-500 flex flex-col items-center gap-1"><i data-lucide="settings"></i><span class="text-[8px] font-bold">Ajustes</span></button>
         </div>
     </nav>
 
-    <!-- Modal Registro -->
-    <div id="quick-modal" class="fixed inset-0 bg-slate-950/80 hidden flex items-center justify-center p-4">
+    <!-- Modal Novo Registro -->
+    <div id="modal-add" class="fixed inset-0 bg-slate-950/90 hidden z-[200] flex items-center justify-center p-4 backdrop-blur-sm">
         <div class="bento-card w-full max-w-lg p-8 space-y-6">
-            <div class="flex justify-between items-center"><h2 class="text-2xl font-black font-title uppercase" id="modal-title">Novo Registro</h2><button onclick="closeModal()" class="text-slate-500"><i data-lucide="x"></i></button></div>
-            <form id="activity-form" class="space-y-4">
-                <div id="delivery-fields" class="grid grid-cols-2 gap-4">
-                    <div class="col-span-2"><label class="text-[10px] font-black text-slate-500 uppercase">Ganhos (R$)</label><input type="number" step="0.01" id="input-val" class="w-full bg-slate-800 border-none rounded-xl p-4 mt-1 font-bold outline-none focus:ring-2 focus:ring-emerald-500"></div>
-                    <div><label class="text-[10px] font-black text-slate-500 uppercase">Gorjeta</label><input type="number" step="0.01" id="input-tip" class="w-full bg-slate-800 border-none rounded-xl p-4 mt-1 font-bold"></div>
-                    <div><label class="text-[10px] font-black text-slate-500 uppercase">Plataforma</label><select id="input-platform" class="w-full bg-slate-800 border-none rounded-xl p-4 mt-1 font-bold"><option>iFood</option><option>Particular</option></select></div>
+            <div class="flex justify-between items-center">
+                <h2 class="text-2xl font-black font-title uppercase tracking-tighter" id="modal-title">Novo Delivery</h2>
+                <button onclick="closeModal()" class="text-slate-500 hover:text-white"><i data-lucide="x"></i></button>
+            </div>
+            <form id="form-activity" class="space-y-4">
+                <div id="fields-delivery" class="grid grid-cols-2 gap-4">
+                    <div class="col-span-2"><label class="text-[10px] font-black text-slate-500 uppercase">Ganhos (R$)</label><input type="number" step="0.01" id="in-val" class="goal-input"></div>
+                    <div><label class="text-[10px] font-black text-slate-500 uppercase">Gorjeta</label><input type="number" step="0.01" id="in-tip" class="goal-input"></div>
+                    <div><label class="text-[10px] font-black text-slate-500 uppercase">Plataforma</label><select id="in-platform" class="goal-input"><option>iFood</option><option>Particular</option></select></div>
                 </div>
-                <div id="pedal-fields" class="grid grid-cols-2 gap-4 hidden">
-                    <div class="col-span-2"><label class="text-[10px] font-black text-slate-500 uppercase">Elevação (m)</label><input type="number" id="input-elev" class="w-full bg-slate-800 border-none rounded-xl p-4 mt-1 font-bold"></div>
-                    <div class="col-span-2"><label class="text-[10px] font-black text-slate-500 uppercase">Tipo</label><select id="input-pedal-type" class="w-full bg-slate-800 border-none rounded-xl p-4 mt-1 font-bold"><option>Urbano</option><option>MTB</option></select></div>
+                <div id="fields-pedal" class="grid grid-cols-2 gap-4 hidden">
+                    <div class="col-span-2"><label class="text-[10px] font-black text-slate-500 uppercase">Elevação (m)</label><input type="number" id="in-elev" class="goal-input"></div>
+                    <div class="col-span-2"><label class="text-[10px] font-black text-slate-500 uppercase">Sensação</label><input type="text" id="in-feeling" class="goal-input" placeholder="Ex: Cansado"></div>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
-                    <div><label class="text-[10px] font-black text-slate-500 uppercase">KM</label><input type="number" step="0.1" id="input-km" class="w-full bg-slate-800 border-none rounded-xl p-4 mt-1 font-bold"></div>
-                    <div><label class="text-[10px] font-black text-slate-500 uppercase">Minutos</label><input type="number" id="input-dur" class="w-full bg-slate-800 border-none rounded-xl p-4 mt-1 font-bold"></div>
+                    <div><label class="text-[10px] font-black text-slate-500 uppercase">KM</label><input type="number" step="0.1" id="in-km" class="goal-input"></div>
+                    <div><label class="text-[10px] font-black text-slate-500 uppercase">Minutos</label><input type="number" id="in-dur" class="goal-input"></div>
                 </div>
-                <button type="submit" class="w-full py-5 rounded-2xl font-black font-title uppercase btn-primary tracking-widest transition-all">Registrar Agora</button>
+                <button type="submit" class="w-full py-5 rounded-2xl font-black uppercase btn-primary tracking-widest transition-all">Registrar Atividade</button>
             </form>
         </div>
     </div>
 
+    <!-- Firebase SDKs -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
+        // COLOQUE SUAS NOVAS CHAVES AQUI
         const firebaseConfig = {
-            apiKey: "AIzaSyDZai14RIMoOhHi3mMrwyVGc6TZsaZPmws",
-            authDomain: "bikeflow-b5564.firebaseapp.com",
-            projectId: "bikeflow-b5564",
-            storageBucket: "bikeflow-b5564.firebasestorage.app",
-            messagingSenderId: "11176109310",
-            appId: "1:11176109310:web:3b6a70b55c2629274c31af",
+            apiKey: "AIzaSyAHWJevmj0dTechlviJIP6NRvmAfkySz8Y",
+            authDomain: "bikeflowv1.firebaseapp.com",
+            projectId: "bikeflowv1",
+            storageBucket: "bikeflowv1.firebasestorage.app",
+            messagingSenderId: "720281539092",
+            appId: "1:720281539092:web:11d08cea73e2ef40004d01",
         };
 
         const app = initializeApp(firebaseConfig);
@@ -287,228 +316,344 @@
         const auth = getAuth(app);
         const provider = new GoogleAuthProvider();
 
+        // App State
         let currentMode = 'delivery';
         let activities = [];
-        let mainChart = null;
-
-        // ESTADO DO TIMER
+        let goals = { money: 150, km: 40, water: 3000, hours: 8 };
+        let currentWater = 0;
         let isTimerRunning = false;
         let startTime = 0;
-        let elapsedTime = 0;
         let timerInterval = null;
 
-        // TIMER LOGIC
-        window.toggleTimer = () => {
-            if (!isTimerRunning) {
-                // START
-                isTimerRunning = true;
-                startTime = Date.now() - elapsedTime;
-                timerInterval = setInterval(updateTimerDisplay, 1000);
-                
-                document.getElementById('timer-card').classList.add('timer-active');
-                document.getElementById('timer-icon').setAttribute('data-lucide', 'pause');
-                document.getElementById('timer-bg-icon').classList.add('text-emerald-500/20');
-                document.getElementById('timer-label').innerText = "Turno Ativo";
-            } else {
-                // PAUSE
-                isTimerRunning = false;
-                clearInterval(timerInterval);
-                elapsedTime = Date.now() - startTime;
-                
-                document.getElementById('timer-card').classList.remove('timer-active');
-                document.getElementById('timer-icon').setAttribute('data-lucide', 'play');
-                document.getElementById('timer-bg-icon').classList.remove('text-emerald-500/20');
-                document.getElementById('timer-label').innerText = "Turno Pausado";
-            }
-            lucide.createIcons();
-        };
+        function formatMsToTime(ms) {
+    const totalSeconds = Math.floor(ms / 1000);
+    const h = Math.floor(totalSeconds / 3600);
+    const m = Math.floor((totalSeconds % 3600) / 60);
+    const s = totalSeconds % 60;
+    return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+}
 
-        window.resetTimer = () => {
-            if(confirm("Deseja zerar o tempo do turno atual?")) {
-                clearInterval(timerInterval);
-                isTimerRunning = false;
-                elapsedTime = 0;
-                document.getElementById('stat-time').innerText = "00:00:00";
-                document.getElementById('timer-card').classList.remove('timer-active');
-                document.getElementById('timer-icon').setAttribute('data-lucide', 'play');
-                document.getElementById('timer-label').innerText = "Turno Zerado";
-                lucide.createIcons();
-            }
-        };
+// Atualiza a tela baseada no tempo decorrido
+function refreshTimerUI() {
+    const startTime = localStorage.getItem('bikeFlow_startTime');
+    if (!startTime) return;
 
-        function updateTimerDisplay() {
-            const now = Date.now();
-            const diff = now - startTime;
-            const h = Math.floor(diff / 3600000).toString().padStart(2, '0');
-            const m = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
-            const s = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
-            document.getElementById('stat-time').innerText = `${h}:${m}:${s}`;
+    const diff = Date.now() - parseInt(startTime);
+    document.getElementById('val-time').innerText = formatMsToTime(diff).substring(0, 5); // Mostra HH:MM no card
+    
+    // Lógica de Alerta de Pausa (Opcional: enviar notificação aqui se suportado)
+    const hours = Math.floor(diff / 3600000);
+    if (hours >= 3) {
+        document.getElementById('rest-alert').innerText = "⚠️ HORA DE PARAR E COMER!";
+        document.getElementById('rest-alert').classList.add('text-orange-500');
+    }
+}
+
+window.toggleTimer = () => {
+    const card = document.getElementById('timer-card');
+    const btn = document.getElementById('btn-timer');
+    const isRunning = localStorage.getItem('bikeFlow_timerRunning') === 'true';
+
+    if (!isRunning) {
+        // INICIAR TURNO
+        const startTime = Date.now();
+        localStorage.setItem('bikeFlow_startTime', startTime);
+        localStorage.setItem('bikeFlow_timerRunning', 'true');
+        
+        timerInterval = setInterval(refreshTimerUI, 1000);
+        
+        card.classList.add('timer-active');
+        btn.innerHTML = '<i data-lucide="pause"></i>';
+    } else {
+        // FINALIZAR TURNO
+        if(confirm("Deseja finalizar o turno atual?")) {
+            clearInterval(timerInterval);
+            
+            // Salvar turno no histórico antes de limpar
+            const start = parseInt(localStorage.getItem('bikeFlow_startTime'));
+            const durationMs = Date.now() - start;
+            saveShiftToFirebase(durationMs);
+
+            localStorage.removeItem('bikeFlow_startTime');
+            localStorage.setItem('bikeFlow_timerRunning', 'false');
+            
+            document.getElementById('val-time').innerText = "00:00";
+            card.classList.remove('timer-active');
+            btn.innerHTML = '<i data-lucide="play"></i>';
         }
+    }
+    lucide.createIcons();
+};
 
-        // NAVIGATION
-        window.showView = (viewName) => {
-            document.querySelectorAll('.view-content').forEach(v => v.classList.add('hidden'));
-            document.getElementById(`view-${viewName}`).classList.remove('hidden');
-            
-            document.querySelectorAll('.nav-btn, .nav-link').forEach(btn => {
-                btn.classList.remove('text-emerald-500', 'text-blue-500', 'active', 'bg-emerald-500/10', 'bg-blue-500/10', 'font-bold');
-                btn.classList.add('text-slate-500');
-            });
+// Função para recuperar o tempo se a página for fechada/recarregada
+function restoreTimerState() {
+    const isRunning = localStorage.getItem('bikeFlow_timerRunning') === 'true';
+    if (isRunning) {
+        const card = document.getElementById('timer-card');
+        const btn = document.getElementById('btn-timer');
+        
+        card.classList.add('timer-active');
+        btn.innerHTML = '<i data-lucide="pause"></i>';
+        
+        // Reinicia o intervalo visual
+        timerInterval = setInterval(refreshTimerUI, 1000);
+        refreshTimerUI(); // Executa uma vez imediato
+    }
+    lucide.createIcons();
+}
 
-            const colorClass = currentMode === 'delivery' ? 'text-emerald-500' : 'text-blue-500';
-            const bgClass = currentMode === 'delivery' ? 'bg-emerald-500/10' : 'bg-blue-500/10';
+// Chame restoreTimerState dentro do seu DOMContentLoaded
+window.addEventListener('DOMContentLoaded', () => {
+    lucide.createIcons();
+    setMode('delivery');
+    restoreTimerState(); // <-- Adicione isso aqui
+});
 
-            const mob = document.getElementById(`nav-mobile-${viewName}`);
-            if(mob) { mob.classList.add(colorClass, 'active'); mob.classList.remove('text-slate-500'); }
-            
-            const desk = document.getElementById(`nav-desktop-${viewName}`);
-            if(desk) { desk.classList.add(colorClass, bgClass, 'font-bold'); desk.classList.remove('text-slate-500'); }
+async function saveShiftToFirebase(durationMs) {
+    if(!auth.currentUser) return;
+    await addDoc(collection(db, `users/${auth.currentUser.uid}/activities`), {
+        type: 'shift_end',
+        duration_ms: durationMs,
+        duration_str: formatMsToTime(durationMs),
+        timestamp: Date.now()
+    });
+}
 
-            if(viewName === 'history') renderHistory();
-            lucide.createIcons();
-        };
-
-        // AUTH & SYNC
+        // AUTH FUNCTIONS
         window.loginGoogle = async () => await signInWithPopup(auth, provider);
-        window.handleLogout = () => signOut(auth);
+        window.logout = () => signOut(auth);
 
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
-                document.getElementById('login-btn').classList.add('hidden');
-                document.getElementById('logout-btn').classList.remove('hidden');
+                document.getElementById('btn-login').classList.add('hidden');
+                document.getElementById('btn-logout').classList.remove('hidden');
                 document.getElementById('profile-name').innerText = user.displayName;
-                document.getElementById('profile-email').innerText = user.email;
-                document.getElementById('profile-avatar').innerHTML = `<img src="${user.photoURL}" class="h-full w-full object-cover">`;
+                document.getElementById('profile-pic').style.backgroundImage = `url(${user.photoURL})`;
+                document.getElementById('profile-pic').style.backgroundSize = "cover";
+                document.getElementById('sync-status').innerText = "Conectado à nuvem";
+                
+                // Carregar Metas do Usuário
+                const goalDoc = await getDoc(doc(db, `users/${user.uid}/config/goals`));
+                if(goalDoc.exists()) {
+                    goals = goalDoc.data();
+                    fillGoalInputs();
+                }
+                
                 syncData(user.uid);
             } else {
-                document.getElementById('login-btn').classList.remove('hidden');
-                document.getElementById('logout-btn').classList.add('hidden');
-                document.getElementById('profile-name').innerText = "Visitante";
-                document.getElementById('profile-email').innerText = "Local-only Mode";
-                document.getElementById('profile-avatar').innerHTML = `<i data-lucide="user" size="40" class="text-slate-600"></i>`;
-                lucide.createIcons();
+                document.getElementById('btn-login').classList.remove('hidden');
+                document.getElementById('btn-logout').classList.add('hidden');
+                document.getElementById('sync-status').innerText = "Modo Local";
             }
         });
 
+        // DATA SYNC
         function syncData(uid) {
             const q = query(collection(db, `users/${uid}/activities`), orderBy("timestamp", "desc"));
             onSnapshot(q, (snapshot) => {
-                activities = snapshot.docs.map(doc => doc.data());
-                updateDashboard();
-                renderGarage();
+                activities = snapshot.docs.map(doc => ({id: doc.id, ...doc.data()}));
+                updateUI();
             });
         }
 
+        // APP LOGIC
         window.setMode = (mode) => {
             currentMode = mode;
-            document.querySelectorAll('.mode-switch button').forEach(b => b.classList.remove('active'));
-            document.getElementById(`btn-${mode}`).classList.add('active');
+            document.querySelectorAll('#btn-delivery, #btn-pedal').forEach(b => b.classList.remove('bg-emerald-500', 'text-black'));
+            document.getElementById(`btn-${mode}`).classList.add('bg-emerald-500', 'text-black');
             
-            const isDel = mode === 'delivery';
-            const color = isDel ? '#10b981' : '#3b82f6';
-            document.documentElement.style.setProperty('--brand', color);
+            document.getElementById('header-mode-name').innerText = mode === 'delivery' ? 'Delivery' : 'Pedal';
+            document.getElementById('label-primary').innerText = mode === 'delivery' ? 'Ganhos' : 'Elevação';
+            document.getElementById('label-secondary').innerText = mode === 'delivery' ? 'Pedidos' : 'Treinos';
             
-            document.getElementById('header-mode-name').innerText = isDel ? 'Delivery' : 'Pedal';
-            document.getElementById('header-mode-name').className = isDel ? 'text-emerald-500' : 'text-blue-500';
-            
-            updateDashboard();
-            renderGoals();
-            lucide.createIcons();
+            updateUI();
         };
 
-        function updateDashboard() {
-            const filtered = activities.filter(a => a.mode === currentMode);
-            const km = filtered.reduce((acc, curr) => acc + (curr.km || 0), 0);
-            document.getElementById('stat-km').innerText = `${km.toFixed(1)} km`;
+        function updateUI() {
+            const today = new Date().toLocaleDateString();
+            const todayActs = activities.filter(a => new Date(a.timestamp).toLocaleDateString() === today);
+            
+            // Stats Base
+            const modeActs = todayActs.filter(a => a.mode === currentMode);
+            const km = modeActs.reduce((acc, curr) => acc + (curr.km || 0), 0);
+            
+            document.getElementById('val-km').innerText = `${km.toFixed(1)} km`;
 
-            if (currentMode === 'delivery') {
-                const val = filtered.reduce((acc, curr) => acc + (curr.value || 0), 0);
-                const tip = filtered.reduce((acc, curr) => acc + (curr.tip || 0), 0);
-                document.getElementById('card-1-label').innerText = "Ganhos";
-                document.getElementById('card-1-value').innerText = `R$ ${(val + tip).toFixed(2)}`;
-                document.getElementById('card-4-label').innerText = "Pedidos";
-                document.getElementById('card-4-value').innerText = filtered.length;
+            if(currentMode === 'delivery') {
+                const money = modeActs.reduce((acc, curr) => acc + (curr.value || 0) + (curr.tip || 0), 0);
+                document.getElementById('val-primary').innerText = `R$ ${money.toFixed(2)}`;
+                document.getElementById('val-secondary').innerText = modeActs.length;
             } else {
-                const elev = filtered.reduce((acc, curr) => acc + (curr.elevation || 0), 0);
-                document.getElementById('card-1-label').innerText = "Elevação";
-                document.getElementById('card-1-value').innerText = `${elev}m`;
-                document.getElementById('card-4-label').innerText = "Sessões";
-                document.getElementById('card-4-value').innerText = filtered.length;
+                const elev = modeActs.reduce((acc, curr) => acc + (curr.elevation || 0), 0);
+                document.getElementById('val-primary').innerText = `${elev}m`;
+                document.getElementById('val-secondary').innerText = modeActs.length;
             }
-            updateChart();
-        }
 
-        function renderHistory() {
-            const container = document.getElementById('history-list-container');
-            const filtered = activities.filter(a => a.mode === currentMode);
-            if(filtered.length === 0) { container.innerHTML = '<p class="p-10 text-center text-slate-500">Sem atividades registradas.</p>'; return; }
-            container.innerHTML = filtered.map(a => `
-                <div class="bento-card p-6 flex justify-between items-center transition hover:border-white/10 group">
-                    <div class="flex items-center gap-5">
-                        <div class="h-14 w-14 rounded-2xl bg-slate-800 flex items-center justify-center text-${currentMode === 'delivery' ? 'emerald' : 'blue'}-500 group-hover:scale-110 transition">
-                            <i data-lucide="${currentMode === 'delivery' ? 'package' : 'zap'}"></i>
-                        </div>
-                        <div>
-                            <p class="font-black font-title text-lg mb-1 leading-none">${currentMode === 'delivery' ? 'R$ '+ (a.value + a.tip).toFixed(2) : a.elevation + 'm'}</p>
-                            <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest">${new Date(a.timestamp).toLocaleDateString()} • ${a.km}km • ${a.duration}min</p>
-                        </div>
-                    </div>
-                    <i data-lucide="chevron-right" class="text-slate-700"></i>
-                </div>
-            `).join('');
+            // Health
+            const water = todayActs.filter(a => a.type === 'water').reduce((acc, curr) => acc + (curr.amount || 0), 0);
+            document.getElementById('val-water').innerText = `${water}ml`;
+            document.getElementById('bar-water').style.width = `${Math.min(100, (water/goals.water)*100)}%`;
+
+            renderGoalsProgress(todayActs);
+            renderHistory();
             lucide.createIcons();
         }
 
-        function renderGarage() {
-            const km = activities.reduce((acc, curr) => acc + (curr.km || 0), 0);
-            const comps = [{ n: 'Corrente', l: 1000, c: 'emerald' }, { n: 'Freios', l: 1500, c: 'yellow' }, { n: 'Pneus', l: 3000, c: 'blue' }];
-            document.getElementById('garage-health-cards').innerHTML = comps.map(c => {
-                const wear = Math.max(0, 100 - (km/c.l*100));
-                return `<div class="bento-card p-6 flex flex-col items-center"><span class="text-2xl font-black mb-2">${Math.round(wear)}%</span><h4 class="text-[10px] font-black uppercase text-slate-500 tracking-widest">${c.n}</h4><div class="w-full bg-slate-800 h-1 mt-4 rounded-full"><div class="bg-${c.c}-500 h-full" style="width: ${wear}%"></div></div></div>`;
+        function renderGoalsProgress(todayActs) {
+            const container = document.getElementById('goals-list');
+            
+            const currentMoney = todayActs.filter(a => a.mode === 'delivery').reduce((acc, curr) => acc + (curr.value || 0) + (curr.tip || 0), 0);
+            const currentKm = todayActs.filter(a => a.mode === 'pedal').reduce((acc, curr) => acc + (curr.km || 0), 0);
+            
+            const items = [
+                { label: 'Ganhos Delivery', curr: currentMoney, target: goals.money, unit: 'R$', color: 'emerald' },
+                { label: 'KM Pedal', curr: currentKm, target: goals.km, unit: 'km', color: 'blue' }
+            ];
+
+            container.innerHTML = items.map(i => {
+                const pct = Math.min(100, (i.curr / i.target) * 100);
+                return `
+                    <div>
+                        <div class="flex justify-between text-[10px] font-black mb-1 uppercase text-slate-500">${i.label}</div>
+                        <div class="h-2 bg-slate-800 rounded-full overflow-hidden">
+                            <div class="bg-${i.color}-500 h-full transition-all duration-1000" style="width: ${pct}%"></div>
+                        </div>
+                        <div class="flex justify-between mt-1 text-[10px] font-bold">
+                            <span>${i.unit === 'R$' ? 'R$ '+i.curr.toFixed(2) : i.curr.toFixed(1) + ' ' + i.unit}</span>
+                            <span class="text-slate-500">Meta: ${i.target}</span>
+                        </div>
+                    </div>
+                `;
             }).join('');
         }
 
-        // MODAL
-        window.openModal = () => {
-            document.getElementById('quick-modal').classList.remove('hidden');
-            const isD = currentMode === 'delivery';
-            document.getElementById('delivery-fields').classList.toggle('hidden', !isD);
-            document.getElementById('pedal-fields').classList.toggle('hidden', isD);
+        window.addWater = async () => {
+            if(!auth.currentUser) return alert("Logue para salvar!");
+            await addDoc(collection(db, `users/${auth.currentUser.uid}/activities`), {
+                type: 'water',
+                amount: 300,
+                timestamp: Date.now()
+            });
         };
-        window.closeModal = () => document.getElementById('quick-modal').classList.add('hidden');
 
-        document.getElementById('activity-form').addEventListener('submit', async (e) => {
+        window.logBreak = async (reason) => {
+            if(!auth.currentUser) return alert("Logue para salvar!");
+            await addDoc(collection(db, `users/${auth.currentUser.uid}/activities`), {
+                type: 'break',
+                reason: reason,
+                timestamp: Date.now()
+            });
+            alert("Pausa registrada!");
+        };
+
+        // TIMER
+        window.toggleTimer = () => {
+            const card = document.getElementById('timer-card');
+            const btn = document.getElementById('btn-timer');
+            
+            if(!isTimerRunning) {
+                isTimerRunning = true;
+                startTime = Date.now();
+                timerInterval = setInterval(() => {
+                    const diff = Date.now() - startTime;
+                    const h = Math.floor(diff / 3600000);
+                    const m = Math.floor((diff % 3600000) / 60000);
+                    document.getElementById('val-time').innerText = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}`;
+                    
+                    // Alerta de Pausa (a cada 3 horas)
+                    if(h >= 3) {
+                        document.getElementById('rest-alert').innerText = "⚠️ HORA DE PARAR E COMER!";
+                        document.getElementById('rest-alert').classList.add('text-orange-500');
+                    }
+                }, 1000);
+                card.classList.add('timer-active');
+                btn.innerHTML = '<i data-lucide="pause"></i>';
+            } else {
+                isTimerRunning = false;
+                clearInterval(timerInterval);
+                card.classList.remove('timer-active');
+                btn.innerHTML = '<i data-lucide="play"></i>';
+            }
+            lucide.createIcons();
+        };
+
+        // UI HELPERS
+        window.showView = (name) => {
+            document.querySelectorAll('.view-content').forEach(v => v.classList.add('hidden'));
+            document.getElementById(`view-${name}`).classList.remove('hidden');
+            lucide.createIcons();
+        };
+
+        window.openModal = () => {
+            document.getElementById('modal-add').classList.remove('hidden');
+            document.getElementById('modal-title').innerText = currentMode === 'delivery' ? 'Novo Delivery' : 'Novo Pedal';
+            document.getElementById('fields-delivery').classList.toggle('hidden', currentMode !== 'delivery');
+            document.getElementById('fields-pedal').classList.toggle('hidden', currentMode === 'delivery');
+        };
+
+        window.closeModal = () => document.getElementById('modal-add').classList.add('hidden');
+
+        document.getElementById('form-activity').addEventListener('submit', async (e) => {
             e.preventDefault();
-            if(!auth.currentUser) return alert("Logue com Google!");
-            const base = { mode: currentMode, km: parseFloat(document.getElementById('input-km').value) || 0, duration: parseFloat(document.getElementById('input-dur').value) || 0, timestamp: Date.now() };
-            const extra = currentMode === 'delivery' ? { value: parseFloat(document.getElementById('input-val').value) || 0, tip: parseFloat(document.getElementById('input-tip').value) || 0, platform: document.getElementById('input-platform').value } : { elevation: parseFloat(document.getElementById('input-elev').value) || 0, type: document.getElementById('input-pedal-type').value };
-            await addDoc(collection(db, `users/${auth.currentUser.uid}/activities`), {...base, ...extra});
+            if(!auth.currentUser) return alert("Logue para salvar!");
+            
+            const data = {
+                mode: currentMode,
+                km: parseFloat(document.getElementById('in-km').value) || 0,
+                duration: parseFloat(document.getElementById('in-dur').value) || 0,
+                timestamp: Date.now()
+            };
+
+            if(currentMode === 'delivery') {
+                data.value = parseFloat(document.getElementById('in-val').value) || 0;
+                data.tip = parseFloat(document.getElementById('in-tip').value) || 0;
+                data.platform = document.getElementById('in-platform').value;
+            } else {
+                data.elevation = parseFloat(document.getElementById('in-elev').value) || 0;
+                data.feeling = document.getElementById('in-feeling').value;
+            }
+
+            await addDoc(collection(db, `users/${auth.currentUser.uid}/activities`), data);
             closeModal();
             e.target.reset();
         });
 
-        function updateChart() {
-            const ctx = document.getElementById('mainChart').getContext('2d');
-            if(mainChart) mainChart.destroy();
-            mainChart = new Chart(ctx, {
-                type: 'bar',
-                data: { labels: ['S', 'T', 'Q', 'Q', 'S', 'S', 'D'], datasets: [{ label: 'Atividade', data: [5, 15, 10, 25, 30, 20, 35], backgroundColor: currentMode === 'delivery' ? '#10b981' : '#3b82f6', borderRadius: 8 }] },
-                options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false }, ticks: { color: '#475569' } } } }
-            });
+        window.saveGoals = async () => {
+            if(!auth.currentUser) return alert("Logue para salvar!");
+            goals = {
+                money: parseFloat(document.getElementById('goal-money-val').value) || 150,
+                km: parseFloat(document.getElementById('goal-km-val').value) || 40,
+                water: parseFloat(document.getElementById('goal-water-val').value) || 3000,
+                hours: parseFloat(document.getElementById('goal-hours-val').value) || 8
+            };
+            await setDoc(doc(db, `users/${auth.currentUser.uid}/config/goals`), goals);
+            alert("Metas salvas!");
+            updateUI();
+        };
+
+        function fillGoalInputs() {
+            document.getElementById('goal-money-val').value = goals.money;
+            document.getElementById('goal-km-val').value = goals.km;
+            document.getElementById('goal-water-val').value = goals.water;
+            document.getElementById('goal-hours-val').value = goals.hours;
         }
 
-        window.renderGoals = () => {
-            const container = document.getElementById('goals-container');
-            const target = currentMode === 'delivery' ? 150 : 120;
-            const current = currentMode === 'delivery' ? 45 : 30; // Simulado
-            const pct = Math.min(100, (current/target)*100);
-            container.innerHTML = `<div><div class="flex justify-between text-[10px] font-black mb-2 uppercase text-slate-500 tracking-widest">${currentMode === 'delivery' ? 'Meta Dinheiro' : 'Meta KM'}</div><div class="h-2.5 bg-slate-800 rounded-full overflow-hidden"><div class="h-full ${currentMode === 'delivery' ? 'bg-emerald-500' : 'bg-blue-500'}" style="width: ${pct}%"></div></div><div class="flex justify-between mt-3 text-xs font-black italic"><span>${currentMode === 'delivery' ? 'R$ '+current : current+' KM'}</span><span class="text-slate-500">${currentMode === 'delivery' ? 'R$ '+target : target+' KM'}</span></div></div>`;
-        };
+        function renderHistory() {
+            const container = document.getElementById('history-container');
+            container.innerHTML = activities.slice(0, 20).map(a => `
+                <div class="bento-card p-4 flex justify-between items-center">
+                    <div>
+                        <p class="text-[10px] font-black text-slate-500 uppercase">${a.type === 'water' ? 'Hidratação' : (a.mode === 'delivery' ? 'Entrega' : 'Pedal')}</p>
+                        <p class="font-bold">${a.type === 'water' ? a.amount + 'ml' : (a.mode === 'delivery' ? 'R$ ' + (a.value+a.tip).toFixed(2) : a.km + 'km')}</p>
+                    </div>
+                    <span class="text-[8px] font-bold text-slate-600">${new Date(a.timestamp).toLocaleTimeString([], {hour:'2-numeric', minute:'2-numeric'})}</span>
+                </div>
+            `).join('');
+        }
 
         window.addEventListener('DOMContentLoaded', () => {
             lucide.createIcons();
             setMode('delivery');
-            showView('dashboard');
         });
     </script>
 </body>
