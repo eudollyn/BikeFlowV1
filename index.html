@@ -33,8 +33,8 @@
             background: rgba(15, 23, 42, 0.6);
             backdrop-filter: blur(12px);
             border: 1px solid var(--border);
-            border-radius: 24px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 20px;
+            transition: all 0.3s ease;
         }
 
         .btn-primary {
@@ -46,269 +46,239 @@
         .view-content { animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* FAB CENTRAL AJUSTADO */
         .fab-container {
             position: absolute;
             left: 50%;
-            transform: translateX(-50%) translateY(-24px);
+            transform: translateX(-50%) translateY(-28px);
+            z-index: 110;
         }
 
+        .fab-button {
+            height: 60px;
+            width: 60px;
+            background: var(--brand);
+            border: 4px solid var(--bg-deep);
+            border-radius: 20px;
+            rotate: 45deg;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4);
+            transition: all 0.2s ease;
+        }
+
+        .fab-button:active { transform: scale(0.9) rotate(45deg); }
+
+        .fab-icon { rotate: -45deg; color: var(--bg-deep); }
+
+        /* Timer Ativo */
         .timer-active {
             border-color: var(--brand);
-            animation: pulse-glow 2s infinite;
+            background: rgba(16, 185, 129, 0.05);
+            animation: pulse-timer 2s infinite;
+        }
+        @keyframes pulse-timer {
+            0% { box-shadow: 0 0 0px var(--brand-glow); }
+            50% { box-shadow: 0 0 15px var(--brand-glow); }
+            100% { box-shadow: 0 0 0px var(--brand-glow); }
         }
 
-        @keyframes pulse-glow {
-            0% { box-shadow: 0 0 5px var(--brand-glow); }
-            50% { box-shadow: 0 0 20px var(--brand-glow); }
-            100% { box-shadow: 0 0 5px var(--brand-glow); }
-        }
-
-        /* Estilo para inputs de meta */
+        .nav-btn.active { color: var(--brand); font-weight: 700; }
         .goal-input {
             background: rgba(255,255,255,0.03);
             border: 1px solid var(--border);
             border-radius: 12px;
-            padding: 8px 12px;
+            padding: 10px;
             width: 100%;
-            font-weight: bold;
             color: white;
-            outline: none;
+            font-size: 14px;
         }
-        .goal-input:focus { border-color: var(--brand); }
     </style>
 </head>
 <body class="pb-28 lg:pb-0 lg:pl-64 text-slate-200">
 
-    <!-- Sidebar Desktop -->
-    <aside class="hidden lg:flex fixed left-0 top-0 h-screen w-64 flex-col border-r border-white/5 bg-slate-950 p-6 z-50">
-        <div class="flex items-center gap-3 mb-10">
-            <div class="h-10 w-10 bg-emerald-500 rounded-xl flex items-center justify-center">
-                <i data-lucide="zap" class="text-slate-950 fill-current"></i>
-            </div>
-            <span class="text-2xl font-black font-title tracking-tighter">BIKE<span class="text-emerald-500">FLOW</span></span>
-        </div>
-
-        <nav class="space-y-2 flex-1">
-            <button onclick="showView('dashboard')" id="nav-desktop-dashboard" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-emerald-500 bg-emerald-500/10 font-bold active-link transition">
-                <i data-lucide="layout-grid" size="20"></i> Dashboard
-            </button>
-            <button onclick="showView('history')" id="nav-desktop-history" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-white/5 transition">
-                <i data-lucide="database" size="20"></i> Histórico
-            </button>
-            <button onclick="showView('health')" id="nav-desktop-health" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-white/5 transition">
-                <i data-lucide="heart-pulse" size="20"></i> Rider Health
-            </button>
-            <button onclick="showView('garage')" id="nav-desktop-garage" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-white/5 transition">
-                <i data-lucide="wrench" size="20"></i> Oficina
-            </button>
-            <button onclick="showView('profile')" id="nav-desktop-profile" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-white/5 transition">
-                <i data-lucide="settings" size="20"></i> Ajustes
-            </button>
-        </nav>
-    </aside>
-
-    <!-- Main Content -->
-    <main class="p-6 lg:p-10 max-w-7xl mx-auto">
+    <main class="p-4 lg:p-10 max-w-7xl mx-auto space-y-6">
         
-        <!-- VIEW: DASHBOARD -->
+        <!-- DASHBOARD VIEW -->
         <div id="view-dashboard" class="view-content space-y-6">
-            <header class="flex justify-between items-center">
+            
+            <!-- HEADER -->
+            <header class="flex justify-between items-center py-2">
                 <div>
-                    <h1 class="text-2xl font-black font-title uppercase tracking-tighter">Painel de <span id="header-mode-name" class="text-emerald-500">Controle</span></h1>
-                    <p class="text-xs text-slate-500" id="sync-status">Sincronizando com o novo Firebase...</p>
+                    <h1 class="text-xl font-black font-title uppercase tracking-tighter flex items-center gap-2">
+                        BIKEFLOW <span class="text-emerald-500">OS</span>
+                    </h1>
+                    <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest" id="sync-status">Sincronizando...</p>
                 </div>
                 <div class="flex gap-2">
-                    <button onclick="addWater()" class="h-10 w-10 rounded-xl bg-blue-500/20 text-blue-500 flex items-center justify-center border border-blue-500/30">
+                    <button onclick="addWater()" class="h-10 w-10 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center border border-blue-500/20 active:scale-90 transition-transform">
                         <i data-lucide="droplets" size="18"></i>
                     </button>
-                    <div class="h-10 w-10 rounded-xl bg-slate-800 flex items-center justify-center border border-white/5" id="user-initial">
-                        <i data-lucide="user" size="18"></i>
+                    <div class="h-10 w-10 rounded-xl bg-slate-800 flex items-center justify-center border border-white/5 overflow-hidden shadow-lg" id="user-avatar-header">
+                        <i data-lucide="user" size="18" class="text-slate-400"></i>
                     </div>
                 </div>
             </header>
 
-            <!-- Modo Switch -->
-            <div class="flex bg-slate-900 p-1 rounded-2xl w-full border border-white/5">
-                <button onclick="setMode('delivery')" id="btn-delivery" class="flex-1 py-3 rounded-xl text-xs font-black uppercase transition-all">Delivery</button>
-                <button onclick="setMode('pedal')" id="btn-pedal" class="flex-1 py-3 rounded-xl text-xs font-black uppercase transition-all">Pedal</button>
+            <!-- CORRE / PEDAL TOGGLE -->
+            <div class="flex bg-slate-900/80 p-1 rounded-2xl border border-white/5 shadow-inner">
+                <button onclick="setMode('delivery')" id="btn-delivery" class="flex-1 py-3 rounded-xl text-[10px] font-black uppercase transition-all duration-300">Corre</button>
+                <button onclick="setMode('pedal')" id="btn-pedal" class="flex-1 py-3 rounded-xl text-[10px] font-black uppercase transition-all duration-300">Pedal</button>
             </div>
 
-            <!-- Stats Bento -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="bento-card p-5">
-                    <p class="text-[10px] font-black text-slate-500 uppercase mb-1" id="label-primary">Ganhos</p>
-                    <h2 class="text-2xl font-black font-title tracking-tight" id="val-primary">R$ 0,00</h2>
+            <!-- CARDS DE RESUMO -->
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bento-card p-5 space-y-1">
+                    <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest" id="label-primary">Ganhos</p>
+                    <h2 class="text-xl font-black font-title tracking-tight" id="val-primary">R$ 0,00</h2>
                 </div>
-                <div class="bento-card p-5">
-                    <p class="text-[10px] font-black text-slate-500 uppercase mb-1">Distância</p>
-                    <h2 class="text-2xl font-black font-title tracking-tight" id="val-km">0.0 km</h2>
+                <div class="bento-card p-5 space-y-1">
+                    <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Distância</p>
+                    <h2 class="text-xl font-black font-title tracking-tight" id="val-km">0.0 km</h2>
                 </div>
-                <div class="bento-card p-5" id="timer-card">
+                <div class="bento-card p-5 space-y-1 transition-all" id="timer-card">
                     <div class="flex justify-between items-start">
-                        <p class="text-[10px] font-black text-slate-500 uppercase mb-1">Turno</p>
-                        <button onclick="toggleTimer()" id="btn-timer" class="text-emerald-500"><i data-lucide="play" size="14"></i></button>
+                        <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Turno</p>
+                        <button onclick="toggleTimer()" id="btn-timer-icon" class="text-emerald-500"><i data-lucide="play" size="14"></i></button>
                     </div>
-                    <h2 class="text-2xl font-black font-title tracking-tight tabular-nums" id="val-time">00:00</h2>
+                    <h2 class="text-xl font-black font-title tracking-tight tabular-nums" id="val-time">00:00</h2>
                 </div>
-                <div class="bento-card p-5">
-                    <p class="text-[10px] font-black text-slate-500 uppercase mb-1" id="label-secondary">Pedidos</p>
-                    <h2 class="text-2xl font-black font-title tracking-tight" id="val-secondary">0</h2>
+                <div class="bento-card p-5 space-y-1">
+                    <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest" id="label-secondary">Pedidos</p>
+                    <h2 class="text-xl font-black font-title tracking-tight" id="val-secondary">0</h2>
                 </div>
             </div>
 
-            <!-- Metas e Saúde Grid -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Metas Dinâmicas -->
-                <div class="bento-card p-6 space-y-6">
-                    <h3 class="font-black text-sm uppercase tracking-widest text-slate-400 flex items-center gap-2">
-                        <i data-lucide="target" size="16"></i> Objetivos do Dia
-                    </h3>
-                    <div class="space-y-4" id="goals-list">
-                        <!-- JS Render -->
-                    </div>
+            <!-- PROGRESSO DO DIA -->
+            <div class="bento-card p-6 space-y-5">
+                <h3 class="font-black text-[10px] uppercase tracking-[0.2em] text-slate-500">Progresso do Dia</h3>
+                <div class="space-y-4" id="goals-list-render">
+                    <!-- Progress bars injetadas via JS -->
                 </div>
+            </div>
 
-                <!-- Rider Health & Alerts -->
-                <div class="bento-card p-6 space-y-4">
-                    <h3 class="font-black text-sm uppercase tracking-widest text-slate-400 flex items-center gap-2">
-                        <i data-lucide="activity" size="16"></i> Rider Health
-                    </h3>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="p-4 bg-blue-500/5 rounded-2xl border border-blue-500/10">
-                            <p class="text-[10px] font-black text-blue-500 uppercase mb-1">Hidratação</p>
-                            <h4 class="text-xl font-black" id="val-water">0ml</h4>
-                            <div class="w-full bg-slate-800 h-1 mt-2 rounded-full overflow-hidden">
-                                <div id="bar-water" class="bg-blue-500 h-full w-[0%]"></div>
-                            </div>
-                        </div>
-                        <div class="p-4 bg-orange-500/5 rounded-2xl border border-orange-500/10">
-                            <p class="text-[10px] font-black text-orange-500 uppercase mb-1">Próxima Pausa</p>
-                            <h4 class="text-xl font-black" id="val-rest">--:--</h4>
-                            <p class="text-[8px] text-slate-500 mt-1 uppercase font-bold" id="rest-alert">Sistema de fadiga inativo</p>
-                        </div>
+            <!-- BIO-STATUS -->
+            <div class="bento-card p-6 space-y-5">
+                <h3 class="font-black text-[10px] uppercase tracking-[0.2em] text-slate-500">Bio-Status</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="p-4 bg-blue-500/5 rounded-2xl border border-blue-500/10">
+                        <p class="text-[9px] font-black text-blue-500 uppercase mb-1">Água</p>
+                        <h4 class="text-xl font-black" id="val-water">0ml</h4>
+                        <div class="w-full bg-slate-800 h-1 mt-2 rounded-full overflow-hidden"><div id="bar-water" class="bg-blue-500 h-full transition-all duration-700" style="width: 0%"></div></div>
                     </div>
-                    <div class="p-4 rounded-2xl bg-slate-800/50 border border-white/5 flex items-center justify-between">
-                        <div class="flex items-center gap-3">
-                            <i data-lucide="coffee" class="text-slate-500"></i>
-                            <span class="text-xs font-bold text-slate-400">Pausar para alimentação?</span>
-                        </div>
-                        <button onclick="logBreak('Comida')" class="px-4 py-2 bg-slate-700 rounded-lg text-[10px] font-black uppercase">Registrar</button>
+                    <div class="p-4 bg-orange-500/5 rounded-2xl border border-orange-500/10">
+                        <p class="text-[9px] font-black text-orange-500 uppercase mb-1">Próxima Pausa</p>
+                        <h4 class="text-xl font-black" id="val-rest">--:--</h4>
+                        <p class="text-[8px] text-slate-500 font-bold uppercase mt-1" id="rest-alert">Sistema Offline</p>
                     </div>
                 </div>
+                <button onclick="logBreak()" class="w-full py-4 bg-slate-800 rounded-xl text-[10px] font-black uppercase border border-white/5 active:scale-95 transition-transform tracking-widest">Registrar Alimentação / Pausa</button>
             </div>
         </div>
 
-        <!-- VIEW: HISTÓRICO -->
-        <div id="view-history" class="view-content hidden space-y-6">
-            <h1 class="text-2xl font-black font-title uppercase tracking-tighter">Linha do <span class="text-emerald-500">Tempo</span></h1>
-            <div id="history-container" class="space-y-4"></div>
+        <!-- VIEW: LOGS -->
+        <div id="view-history" class="view-content hidden space-y-4">
+            <h1 class="text-xl font-black font-title uppercase">Histórico Recente</h1>
+            <div id="history-container" class="space-y-3"></div>
         </div>
 
-        <!-- VIEW: GARAGEM -->
-        <div id="view-garage" class="view-content hidden space-y-6 text-center">
-            <i data-lucide="wrench" size="48" class="mx-auto text-slate-700"></i>
-            <h1 class="text-xl font-black uppercase">Oficina em breve</h1>
-        </div>
+        <!-- VIEW: METAS / SETTINGS -->
+        <div id="view-settings" class="view-content hidden space-y-6">
+            <div class="bento-card p-8 text-center space-y-4">
+                <div id="profile-pic" class="h-20 w-20 bg-slate-800 rounded-2xl mx-auto border-2 border-brand overflow-hidden shadow-2xl"></div>
+                <h2 id="profile-name" class="font-black text-lg uppercase tracking-tight">Rider Anonimo</h2>
+                <button onclick="loginGoogle()" id="btn-login" class="w-full py-4 bg-white text-black font-black rounded-xl text-xs">LOGAR COM GOOGLE</button>
+                <button onclick="handleLogout()" id="btn-logout" class="hidden w-full py-3 bg-red-500/10 text-red-500 font-black rounded-xl text-xs">SAIR</button>
+            </div>
 
-        <!-- VIEW: CONFIGURAÇÕES -->
-        <div id="view-profile" class="view-content hidden space-y-8">
-            <h1 class="text-2xl font-black font-title uppercase tracking-tighter">Ajustes e <span class="text-emerald-500">Metas</span></h1>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Perfil -->
-                <div class="bento-card p-8 text-center">
-                    <div id="profile-pic" class="h-20 w-20 bg-slate-800 rounded-full mx-auto mb-4 border-2 border-brand"></div>
-                    <h2 id="profile-name" class="font-black text-xl">Rider Visitante</h2>
-                    <button onclick="loginGoogle()" id="btn-login" class="mt-6 w-full py-4 bg-white text-black font-black rounded-2xl">LOGAR COM GOOGLE</button>
-                    <button onclick="logout()" id="btn-logout" class="hidden mt-6 w-full py-4 bg-red-500/10 text-red-500 font-black rounded-2xl border border-red-500/20">SAIR</button>
+            <div class="bento-card p-6 space-y-4">
+                <h3 class="font-black uppercase text-[10px] tracking-widest text-slate-500 text-center">Configurar Metas Diárias</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="text-[9px] font-black text-slate-500 uppercase mb-1 block">R$ Ganhos</label><input type="number" id="goal-money" class="goal-input"></div>
+                    <div><label class="text-[9px] font-black text-slate-500 uppercase mb-1 block">KM Pedal</label><input type="number" id="goal-km" class="goal-input"></div>
+                    <div><label class="text-[9px] font-black text-slate-500 uppercase mb-1 block">Água (ml)</label><input type="number" id="goal-water" class="goal-input"></div>
+                    <div><label class="text-[9px] font-black text-slate-500 uppercase mb-1 block">Horas Turno</label><input type="number" id="goal-hours" class="goal-input"></div>
                 </div>
-
-                <!-- Metas Diárias -->
-                <div class="bento-card p-8 space-y-4">
-                    <h3 class="font-black uppercase text-xs tracking-widest text-slate-500">Definir Metas Diárias</h3>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="text-[10px] font-black uppercase text-slate-500">R$ Ganhos</label>
-                            <input type="number" id="goal-money-val" class="goal-input" placeholder="150">
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-black uppercase text-slate-500">KM Pedal</label>
-                            <input type="number" id="goal-km-val" class="goal-input" placeholder="40">
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-black uppercase text-slate-500">Água (ml)</label>
-                            <input type="number" id="goal-water-val" class="goal-input" placeholder="3000">
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-black uppercase text-slate-500">Horas Turno</label>
-                            <input type="number" id="goal-hours-val" class="goal-input" placeholder="8">
-                        </div>
-                    </div>
-                    <button onclick="saveGoals()" class="w-full py-4 btn-primary rounded-2xl font-black uppercase tracking-widest mt-4">Salvar Metas</button>
-                </div>
+                <button onclick="saveGoals()" class="w-full py-4 btn-primary rounded-xl font-black uppercase text-[10px] tracking-widest">Salvar Objetivos</button>
             </div>
         </div>
+
     </main>
 
-    <!-- Barra Inferior -->
-    <nav class="lg:hidden fixed bottom-0 left-0 right-0 h-20 bg-slate-950/80 backdrop-blur-xl border-t border-white/5 flex items-center justify-between px-6 z-50">
+    <!-- BARRA DE NAVEGAÇÃO INFERIOR -->
+    <nav class="lg:hidden fixed bottom-0 left-0 right-0 h-20 bg-slate-950/90 backdrop-blur-xl border-t border-white/5 flex items-center justify-between px-8 z-[100]">
         <div class="flex w-2/5 justify-around items-center">
-            <button onclick="showView('dashboard')" class="nav-btn text-emerald-500 flex flex-col items-center gap-1"><i data-lucide="layout-grid"></i><span class="text-[8px] font-bold">Home</span></button>
-            <button onclick="showView('history')" class="nav-btn text-slate-500 flex flex-col items-center gap-1"><i data-lucide="database"></i><span class="text-[8px] font-bold">Logs</span></button>
+            <button onclick="showView('dashboard')" id="nav-dashboard" class="nav-btn active flex flex-col items-center gap-1 transition-colors">
+                <i data-lucide="layout-grid" size="20"></i>
+                <span class="text-[7px] font-black uppercase">Home</span>
+            </button>
+            <button onclick="showView('history')" id="nav-history" class="nav-btn text-slate-500 flex flex-col items-center gap-1 transition-colors">
+                <i data-lucide="database" size="20"></i>
+                <span class="text-[7px] font-black uppercase">Logs</span>
+            </button>
         </div>
 
         <div class="fab-container">
-            <button onclick="openModal()" class="h-16 w-16 btn-primary rounded-2xl rotate-45 flex items-center justify-center shadow-2xl border-4 border-slate-950">
-                <i data-lucide="plus" class="-rotate-45 text-slate-950" size="32"></i>
+            <button onclick="openModal()" class="fab-button">
+                <i data-lucide="plus" size="28" class="fab-icon"></i>
             </button>
         </div>
 
         <div class="flex w-2/5 justify-around items-center">
-            <button onclick="showView('health')" class="nav-btn text-slate-500 flex flex-col items-center gap-1"><i data-lucide="heart-pulse"></i><span class="text-[8px] font-bold">Saúde</span></button>
-            <button onclick="showView('profile')" class="nav-btn text-slate-500 flex flex-col items-center gap-1"><i data-lucide="settings"></i><span class="text-[8px] font-bold">Ajustes</span></button>
+            <button onclick="showView('history')" class="nav-btn text-slate-500 flex flex-col items-center gap-1 transition-colors">
+                <i data-lucide="wrench" size="20"></i>
+                <span class="text-[7px] font-black uppercase">Oficina</span>
+            </button>
+            <button onclick="showView('settings')" id="nav-settings" class="nav-btn text-slate-500 flex flex-col items-center gap-1 transition-colors">
+                <i data-lucide="settings" size="20"></i>
+                <span class="text-[7px] font-black uppercase">Metas</span>
+            </button>
         </div>
     </nav>
 
-    <!-- Modal Novo Registro -->
-    <div id="modal-add" class="fixed inset-0 bg-slate-950/90 hidden z-[200] flex items-center justify-center p-4 backdrop-blur-sm">
-        <div class="bento-card w-full max-w-lg p-8 space-y-6">
+    <!-- MODAL NOVO REGISTRO -->
+    <div id="modal-add" class="fixed inset-0 bg-slate-950/95 hidden z-[300] flex items-center justify-center p-6">
+        <div class="bento-card w-full max-w-sm p-8 space-y-6 border-emerald-500/20 shadow-2xl">
             <div class="flex justify-between items-center">
-                <h2 class="text-2xl font-black font-title uppercase tracking-tighter" id="modal-title">Novo Delivery</h2>
-                <button onclick="closeModal()" class="text-slate-500 hover:text-white"><i data-lucide="x"></i></button>
+                <h2 class="text-xl font-black font-title uppercase tracking-tight" id="modal-title">Novo Corre</h2>
+                <button onclick="closeModal()" class="text-slate-500"><i data-lucide="x" size="20"></i></button>
             </div>
             <form id="form-activity" class="space-y-4">
-                <div id="fields-delivery" class="grid grid-cols-2 gap-4">
-                    <div class="col-span-2"><label class="text-[10px] font-black text-slate-500 uppercase">Ganhos (R$)</label><input type="number" step="0.01" id="in-val" class="goal-input"></div>
-                    <div><label class="text-[10px] font-black text-slate-500 uppercase">Gorjeta</label><input type="number" step="0.01" id="in-tip" class="goal-input"></div>
-                    <div><label class="text-[10px] font-black text-slate-500 uppercase">Plataforma</label><select id="in-platform" class="goal-input"><option>iFood</option><option>Particular</option></select></div>
+                <div id="fields-delivery" class="space-y-4">
+                    <div><label class="text-[9px] font-black text-slate-500 uppercase mb-1 block tracking-widest">Valor do Frete (R$)</label><input type="number" step="0.01" id="in-val" class="goal-input text-lg font-bold"></div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div><label class="text-[9px] font-black text-slate-500 uppercase mb-1 block">Gorjeta</label><input type="number" step="0.01" id="in-tip" class="goal-input font-bold" value="0"></div>
+                        <div><label class="text-[9px] font-black text-slate-500 uppercase mb-1 block">Plataforma</label><select id="in-platform" class="goal-input font-bold"><option>iFood</option><option>99</option><option>Particular</option></select></div>
+                    </div>
                 </div>
-                <div id="fields-pedal" class="grid grid-cols-2 gap-4 hidden">
-                    <div class="col-span-2"><label class="text-[10px] font-black text-slate-500 uppercase">Elevação (m)</label><input type="number" id="in-elev" class="goal-input"></div>
-                    <div class="col-span-2"><label class="text-[10px] font-black text-slate-500 uppercase">Sensação</label><input type="text" id="in-feeling" class="goal-input" placeholder="Ex: Cansado"></div>
+                <div id="fields-pedal" class="hidden space-y-4">
+                    <div><label class="text-[9px] font-black text-slate-500 uppercase mb-1 block">Elevação (Metros)</label><input type="number" id="in-elev" class="goal-input text-lg font-bold"></div>
+                    <div><label class="text-[9px] font-black text-slate-500 uppercase mb-1 block">Sensação</label><input type="text" id="in-feeling" class="goal-input" placeholder="Ex: Treino Forte"></div>
                 </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div><label class="text-[10px] font-black text-slate-500 uppercase">KM</label><input type="number" step="0.1" id="in-km" class="goal-input"></div>
-                    <div><label class="text-[10px] font-black text-slate-500 uppercase">Minutos</label><input type="number" id="in-dur" class="goal-input"></div>
+                <div class="grid grid-cols-2 gap-4 pt-2">
+                    <div><label class="text-[9px] font-black text-slate-500 uppercase mb-1 block">Distância KM</label><input type="number" step="0.1" id="in-km" class="goal-input font-bold"></div>
+                    <div><label class="text-[9px] font-black text-slate-500 uppercase mb-1 block">Duração (Min)</label><input type="number" id="in-dur" class="goal-input font-bold"></div>
                 </div>
-                <button type="submit" class="w-full py-5 rounded-2xl font-black uppercase btn-primary tracking-widest transition-all">Registrar Atividade</button>
+                <button type="submit" class="w-full py-5 rounded-2xl font-black uppercase btn-primary tracking-[0.2em] text-[10px] mt-2">Salvar Registro</button>
             </form>
         </div>
     </div>
 
-    <!-- Firebase SDKs -->
+    <!-- FIREBASE & LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getAuth, signInWithRedirect, GoogleAuthProvider, onAuthStateChanged, signOut, getRedirectResult } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        // COLOQUE SUAS NOVAS CHAVES AQUI
+        // CONFIGURAÇÃO DO NOVO PROJETO - COLE AQUI
         const firebaseConfig = {
             apiKey: "AIzaSyAHWJevmj0dTechlviJIP6NRvmAfkySz8Y",
             authDomain: "bikeflowv1.firebaseapp.com",
             projectId: "bikeflowv1",
             storageBucket: "bikeflowv1.firebasestorage.app",
             messagingSenderId: "720281539092",
-            appId: "1:720281539092:web:11d08cea73e2ef40004d01",
+            appId: "1:720281539092:web:11d08cea73e2ef40004d01"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -316,129 +286,28 @@
         const auth = getAuth(app);
         const provider = new GoogleAuthProvider();
 
-        // App State
         let currentMode = 'delivery';
         let activities = [];
         let goals = { money: 150, km: 40, water: 3000, hours: 8 };
-        let currentWater = 0;
-        let isTimerRunning = false;
-        let startTime = 0;
         let timerInterval = null;
 
-        function formatMsToTime(ms) {
-    const totalSeconds = Math.floor(ms / 1000);
-    const h = Math.floor(totalSeconds / 3600);
-    const m = Math.floor((totalSeconds % 3600) / 60);
-    const s = totalSeconds % 60;
-    return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-}
-
-// Atualiza a tela baseada no tempo decorrido
-function refreshTimerUI() {
-    const startTime = localStorage.getItem('bikeFlow_startTime');
-    if (!startTime) return;
-
-    const diff = Date.now() - parseInt(startTime);
-    document.getElementById('val-time').innerText = formatMsToTime(diff).substring(0, 5); // Mostra HH:MM no card
-    
-    // Lógica de Alerta de Pausa (Opcional: enviar notificação aqui se suportado)
-    const hours = Math.floor(diff / 3600000);
-    if (hours >= 3) {
-        document.getElementById('rest-alert').innerText = "⚠️ HORA DE PARAR E COMER!";
-        document.getElementById('rest-alert').classList.add('text-orange-500');
-    }
-}
-
-window.toggleTimer = () => {
-    const card = document.getElementById('timer-card');
-    const btn = document.getElementById('btn-timer');
-    const isRunning = localStorage.getItem('bikeFlow_timerRunning') === 'true';
-
-    if (!isRunning) {
-        // INICIAR TURNO
-        const startTime = Date.now();
-        localStorage.setItem('bikeFlow_startTime', startTime);
-        localStorage.setItem('bikeFlow_timerRunning', 'true');
-        
-        timerInterval = setInterval(refreshTimerUI, 1000);
-        
-        card.classList.add('timer-active');
-        btn.innerHTML = '<i data-lucide="pause"></i>';
-    } else {
-        // FINALIZAR TURNO
-        if(confirm("Deseja finalizar o turno atual?")) {
-            clearInterval(timerInterval);
-            
-            // Salvar turno no histórico antes de limpar
-            const start = parseInt(localStorage.getItem('bikeFlow_startTime'));
-            const durationMs = Date.now() - start;
-            saveShiftToFirebase(durationMs);
-
-            localStorage.removeItem('bikeFlow_startTime');
-            localStorage.setItem('bikeFlow_timerRunning', 'false');
-            
-            document.getElementById('val-time').innerText = "00:00";
-            card.classList.remove('timer-active');
-            btn.innerHTML = '<i data-lucide="play"></i>';
-        }
-    }
-    lucide.createIcons();
-};
-
-// Função para recuperar o tempo se a página for fechada/recarregada
-function restoreTimerState() {
-    const isRunning = localStorage.getItem('bikeFlow_timerRunning') === 'true';
-    if (isRunning) {
-        const card = document.getElementById('timer-card');
-        const btn = document.getElementById('btn-timer');
-        
-        card.classList.add('timer-active');
-        btn.innerHTML = '<i data-lucide="pause"></i>';
-        
-        // Reinicia o intervalo visual
-        timerInterval = setInterval(refreshTimerUI, 1000);
-        refreshTimerUI(); // Executa uma vez imediato
-    }
-    lucide.createIcons();
-}
-
-// Chame restoreTimerState dentro do seu DOMContentLoaded
-window.addEventListener('DOMContentLoaded', () => {
-    lucide.createIcons();
-    setMode('delivery');
-    restoreTimerState(); // <-- Adicione isso aqui
-});
-
-async function saveShiftToFirebase(durationMs) {
-    if(!auth.currentUser) return;
-    await addDoc(collection(db, `users/${auth.currentUser.uid}/activities`), {
-        type: 'shift_end',
-        duration_ms: durationMs,
-        duration_str: formatMsToTime(durationMs),
-        timestamp: Date.now()
-    });
-}
-
-        // AUTH FUNCTIONS
-        window.loginGoogle = async () => await signInWithPopup(auth, provider);
-        window.logout = () => signOut(auth);
+        // AUTH
+        window.loginGoogle = () => signInWithRedirect(auth, provider);
+        window.handleLogout = () => signOut(auth);
 
         onAuthStateChanged(auth, async (user) => {
+            try { await getRedirectResult(auth); } catch (e) {}
             if (user) {
                 document.getElementById('btn-login').classList.add('hidden');
                 document.getElementById('btn-logout').classList.remove('hidden');
                 document.getElementById('profile-name').innerText = user.displayName;
                 document.getElementById('profile-pic').style.backgroundImage = `url(${user.photoURL})`;
                 document.getElementById('profile-pic').style.backgroundSize = "cover";
-                document.getElementById('sync-status').innerText = "Conectado à nuvem";
+                document.getElementById('user-avatar-header').innerHTML = `<img src="${user.photoURL}" class="w-full h-full object-cover">`;
+                document.getElementById('sync-status').innerText = "Nuvem Sincronizada";
                 
-                // Carregar Metas do Usuário
-                const goalDoc = await getDoc(doc(db, `users/${user.uid}/config/goals`));
-                if(goalDoc.exists()) {
-                    goals = goalDoc.data();
-                    fillGoalInputs();
-                }
-                
+                const gDoc = await getDoc(doc(db, `users/${user.uid}/config/goals`));
+                if(gDoc.exists()) { goals = gDoc.data(); updateGoalsForm(); }
                 syncData(user.uid);
             } else {
                 document.getElementById('btn-login').classList.remove('hidden');
@@ -449,144 +318,172 @@ async function saveShiftToFirebase(durationMs) {
 
         // DATA SYNC
         function syncData(uid) {
-            const q = query(collection(db, `users/${uid}/activities`), orderBy("timestamp", "desc"));
-            onSnapshot(q, (snapshot) => {
-                activities = snapshot.docs.map(doc => ({id: doc.id, ...doc.data()}));
+            onSnapshot(query(collection(db, `users/${uid}/activities`), orderBy("timestamp", "desc")), (snap) => {
+                activities = snap.docs.map(d => d.data());
                 updateUI();
             });
+        }
+
+        // TIMER & FADIGA
+        function refreshTimer() {
+            const start = localStorage.getItem('bikeFlow_startTime');
+            if(!start) return;
+            const diff = Date.now() - parseInt(start);
+            const h = Math.floor(diff / 3600000);
+            const m = Math.floor((diff % 3600000) / 60000);
+            document.getElementById('val-time').innerText = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}`;
+            
+            // Fadiga System
+            const restVal = document.getElementById('val-rest');
+            const restAlert = document.getElementById('rest-alert');
+            const nextBreak = new Date(parseInt(start) + (3 * 3600000));
+            restVal.innerText = nextBreak.toLocaleTimeString([], {hour:'2-numeric', minute:'2-numeric'});
+            
+            if(h < 2.5) { restAlert.innerText = "Estado: Focado"; restAlert.className = "text-[8px] font-bold uppercase text-emerald-500"; }
+            else if(h < 3) { restAlert.innerText = "Prepare Pausa"; restAlert.className = "text-[8px] font-bold uppercase text-orange-500"; }
+            else { restAlert.innerText = "PERIGO: PARE!"; restAlert.className = "text-[8px] font-bold uppercase text-red-500 animate-pulse"; }
+        }
+
+        window.toggleTimer = () => {
+            const isRunning = localStorage.getItem('bikeFlow_timerRunning') === 'true';
+            if(!isRunning) {
+                localStorage.setItem('bikeFlow_startTime', Date.now());
+                localStorage.setItem('bikeFlow_timerRunning', 'true');
+                timerInterval = setInterval(refreshTimer, 1000);
+                document.getElementById('timer-card').classList.add('timer-active');
+                document.getElementById('btn-timer-icon').innerHTML = '<i data-lucide="pause"></i>';
+            } else {
+                if(confirm("Deseja finalizar o turno atual?")) {
+                    clearInterval(timerInterval);
+                    localStorage.setItem('bikeFlow_timerRunning', 'false');
+                    localStorage.removeItem('bikeFlow_startTime');
+                    document.getElementById('timer-card').classList.remove('timer-active');
+                    document.getElementById('val-time').innerText = "00:00";
+                    document.getElementById('btn-timer-icon').innerHTML = '<i data-lucide="play"></i>';
+                    document.getElementById('val-rest').innerText = "--:--";
+                    document.getElementById('rest-alert').innerText = "Inativo";
+                }
+            }
+            lucide.createIcons();
         }
 
         // APP LOGIC
         window.setMode = (mode) => {
             currentMode = mode;
-            document.querySelectorAll('#btn-delivery, #btn-pedal').forEach(b => b.classList.remove('bg-emerald-500', 'text-black'));
-            document.getElementById(`btn-${mode}`).classList.add('bg-emerald-500', 'text-black');
+            const isDel = mode === 'delivery';
             
-            document.getElementById('header-mode-name').innerText = mode === 'delivery' ? 'Delivery' : 'Pedal';
-            document.getElementById('label-primary').innerText = mode === 'delivery' ? 'Ganhos' : 'Elevação';
-            document.getElementById('label-secondary').innerText = mode === 'delivery' ? 'Pedidos' : 'Treinos';
+            document.getElementById('btn-delivery').className = isDel ? "flex-1 py-3 rounded-xl text-[10px] font-black uppercase bg-emerald-500 text-black shadow-lg" : "flex-1 py-3 rounded-xl text-[10px] font-black uppercase text-slate-500";
+            document.getElementById('btn-pedal').className = !isDel ? "flex-1 py-3 rounded-xl text-[10px] font-black uppercase bg-emerald-500 text-black shadow-lg" : "flex-1 py-3 rounded-xl text-[10px] font-black uppercase text-slate-500";
             
+            document.getElementById('label-primary').innerText = isDel ? 'Ganhos' : 'Elevação';
+            document.getElementById('label-secondary').innerText = isDel ? 'Pedidos' : 'Treinos';
             updateUI();
         };
 
         function updateUI() {
             const today = new Date().toLocaleDateString();
-            const todayActs = activities.filter(a => new Date(a.timestamp).toLocaleDateString() === today);
+            const tActs = activities.filter(a => new Date(a.timestamp).toLocaleDateString() === today);
+            const mActs = tActs.filter(a => a.mode === currentMode);
             
-            // Stats Base
-            const modeActs = todayActs.filter(a => a.mode === currentMode);
-            const km = modeActs.reduce((acc, curr) => acc + (curr.km || 0), 0);
-            
+            const km = mActs.reduce((acc, curr) => acc + (curr.km || 0), 0);
             document.getElementById('val-km').innerText = `${km.toFixed(1)} km`;
 
             if(currentMode === 'delivery') {
-                const money = modeActs.reduce((acc, curr) => acc + (curr.value || 0) + (curr.tip || 0), 0);
+                const money = mActs.reduce((acc, c) => acc + (c.value||0) + (c.tip||0), 0);
                 document.getElementById('val-primary').innerText = `R$ ${money.toFixed(2)}`;
-                document.getElementById('val-secondary').innerText = modeActs.length;
+                document.getElementById('val-secondary').innerText = mActs.length;
             } else {
-                const elev = modeActs.reduce((acc, curr) => acc + (curr.elevation || 0), 0);
+                const elev = mActs.reduce((acc, c) => acc + (c.elevation||0), 0);
                 document.getElementById('val-primary').innerText = `${elev}m`;
-                document.getElementById('val-secondary').innerText = modeActs.length;
+                document.getElementById('val-secondary').innerText = mActs.length;
             }
 
-            // Health
-            const water = todayActs.filter(a => a.type === 'water').reduce((acc, curr) => acc + (curr.amount || 0), 0);
+            const water = tActs.filter(a => a.type === 'water').reduce((acc, c) => acc + (c.amount||0), 0);
             document.getElementById('val-water').innerText = `${water}ml`;
             document.getElementById('bar-water').style.width = `${Math.min(100, (water/goals.water)*100)}%`;
 
-            renderGoalsProgress(todayActs);
+            renderProgress(tActs);
             renderHistory();
             lucide.createIcons();
         }
 
-        function renderGoalsProgress(todayActs) {
-            const container = document.getElementById('goals-list');
+        function renderProgress(tActs) {
+            const money = tActs.filter(a => a.mode === 'delivery').reduce((acc, c) => acc + (c.value||0) + (c.tip||0), 0);
+            const km = tActs.filter(a => a.mode === 'pedal').reduce((acc, curr) => acc + (curr.km || 0), 0);
             
-            const currentMoney = todayActs.filter(a => a.mode === 'delivery').reduce((acc, curr) => acc + (curr.value || 0) + (curr.tip || 0), 0);
-            const currentKm = todayActs.filter(a => a.mode === 'pedal').reduce((acc, curr) => acc + (curr.km || 0), 0);
-            
-            const items = [
-                { label: 'Ganhos Delivery', curr: currentMoney, target: goals.money, unit: 'R$', color: 'emerald' },
-                { label: 'KM Pedal', curr: currentKm, target: goals.km, unit: 'km', color: 'blue' }
+            const gList = [
+                { label: 'Meta de Ganhos', curr: money, target: goals.money, unit: 'R$', color: 'emerald' },
+                { label: 'Meta de KM Pedal', curr: km, target: goals.km, unit: 'km', color: 'blue' }
             ];
 
-            container.innerHTML = items.map(i => {
-                const pct = Math.min(100, (i.curr / i.target) * 100);
+            document.getElementById('goals-list-render').innerHTML = gList.map(g => {
+                const pct = Math.min(100, (g.curr/g.target)*100);
                 return `
-                    <div>
-                        <div class="flex justify-between text-[10px] font-black mb-1 uppercase text-slate-500">${i.label}</div>
-                        <div class="h-2 bg-slate-800 rounded-full overflow-hidden">
-                            <div class="bg-${i.color}-500 h-full transition-all duration-1000" style="width: ${pct}%"></div>
-                        </div>
-                        <div class="flex justify-between mt-1 text-[10px] font-bold">
-                            <span>${i.unit === 'R$' ? 'R$ '+i.curr.toFixed(2) : i.curr.toFixed(1) + ' ' + i.unit}</span>
-                            <span class="text-slate-500">Meta: ${i.target}</span>
-                        </div>
-                    </div>
-                `;
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-[8px] font-black uppercase text-slate-500 tracking-wider"><span>${g.label}</span><span>${Math.round(pct)}%</span></div>
+                        <div class="h-2 bg-slate-800 rounded-full overflow-hidden border border-white/5"><div class="h-full bg-${g.color}-500 transition-all duration-1000" style="width: ${pct}%"></div></div>
+                        <div class="flex justify-between text-[9px] font-bold mt-1"><span>${g.unit === 'R$' ? 'R$ '+g.curr.toFixed(2) : g.curr.toFixed(1) + ' km'}</span><span class="text-slate-600">${g.target} ${g.unit === 'R$' ? '' : 'km'}</span></div>
+                    </div>`;
             }).join('');
         }
 
         window.addWater = async () => {
-            if(!auth.currentUser) return alert("Logue para salvar!");
-            await addDoc(collection(db, `users/${auth.currentUser.uid}/activities`), {
-                type: 'water',
-                amount: 300,
-                timestamp: Date.now()
-            });
+            if(!auth.currentUser) return;
+            await addDoc(collection(db, `users/${auth.currentUser.uid}/activities`), { type: 'water', amount: 300, timestamp: Date.now() });
         };
 
-        window.logBreak = async (reason) => {
-            if(!auth.currentUser) return alert("Logue para salvar!");
-            await addDoc(collection(db, `users/${auth.currentUser.uid}/activities`), {
-                type: 'break',
-                reason: reason,
-                timestamp: Date.now()
-            });
+        window.logBreak = async () => {
+            if(!auth.currentUser) return;
+            await addDoc(collection(db, `users/${auth.currentUser.uid}/activities`), { type: 'break', timestamp: Date.now() });
             alert("Pausa registrada!");
         };
 
-        // TIMER
-        window.toggleTimer = () => {
-            const card = document.getElementById('timer-card');
-            const btn = document.getElementById('btn-timer');
-            
-            if(!isTimerRunning) {
-                isTimerRunning = true;
-                startTime = Date.now();
-                timerInterval = setInterval(() => {
-                    const diff = Date.now() - startTime;
-                    const h = Math.floor(diff / 3600000);
-                    const m = Math.floor((diff % 3600000) / 60000);
-                    document.getElementById('val-time').innerText = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}`;
-                    
-                    // Alerta de Pausa (a cada 3 horas)
-                    if(h >= 3) {
-                        document.getElementById('rest-alert').innerText = "⚠️ HORA DE PARAR E COMER!";
-                        document.getElementById('rest-alert').classList.add('text-orange-500');
-                    }
-                }, 1000);
-                card.classList.add('timer-active');
-                btn.innerHTML = '<i data-lucide="pause"></i>';
-            } else {
-                isTimerRunning = false;
-                clearInterval(timerInterval);
-                card.classList.remove('timer-active');
-                btn.innerHTML = '<i data-lucide="play"></i>';
-            }
-            lucide.createIcons();
+        window.saveGoals = async () => {
+            if(!auth.currentUser) return;
+            goals = { 
+                money: parseFloat(document.getElementById('goal-money').value), 
+                km: parseFloat(document.getElementById('goal-km').value), 
+                water: parseFloat(document.getElementById('goal-water').value), 
+                hours: parseFloat(document.getElementById('goal-hours').value) 
+            };
+            await setDoc(doc(db, `users/${auth.currentUser.uid}/config/goals`), goals);
+            alert("Metas Atualizadas!");
+            updateUI();
         };
 
-        // UI HELPERS
-        window.showView = (name) => {
-            document.querySelectorAll('.view-content').forEach(v => v.classList.add('hidden'));
-            document.getElementById(`view-${name}`).classList.remove('hidden');
+        function updateGoalsForm() {
+            document.getElementById('goal-money').value = goals.money;
+            document.getElementById('goal-km').value = goals.km;
+            document.getElementById('goal-water').value = goals.water;
+            document.getElementById('goal-hours').value = goals.hours;
+        }
+
+        function renderHistory() {
+            document.getElementById('history-container').innerHTML = activities.slice(0, 10).map(a => `
+                <div class="bento-card p-4 flex justify-between items-center border-l-4 ${a.type === 'water' ? 'border-blue-500' : 'border-emerald-500'}">
+                    <div>
+                        <p class="text-[8px] font-black text-slate-500 uppercase">${a.type === 'water' ? 'Hidratação' : (a.mode === 'delivery' ? 'Corre' : 'Pedal')}</p>
+                        <p class="font-bold text-sm">${a.type === 'water' ? a.amount+'ml' : (a.mode === 'delivery' ? 'R$ '+(a.value+a.tip).toFixed(2) : a.km+'km')}</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-[8px] font-bold text-slate-600">${new Date(a.timestamp).toLocaleTimeString([], {hour:'2-numeric', minute:'2-numeric'})}</p>
+                        <p class="text-[7px] text-slate-700 font-bold uppercase">${new Date(a.timestamp).toLocaleDateString()}</p>
+                    </div>
+                </div>`).join('');
+        }
+
+        // NAVIGATION
+        window.showView = (v) => {
+            document.querySelectorAll('.view-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`view-${v}`).classList.remove('hidden');
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`nav-${v}`).classList.add('active');
             lucide.createIcons();
         };
 
         window.openModal = () => {
             document.getElementById('modal-add').classList.remove('hidden');
-            document.getElementById('modal-title').innerText = currentMode === 'delivery' ? 'Novo Delivery' : 'Novo Pedal';
+            document.getElementById('modal-title').innerText = currentMode === 'delivery' ? 'Novo Corre' : 'Novo Pedal';
             document.getElementById('fields-delivery').classList.toggle('hidden', currentMode !== 'delivery');
             document.getElementById('fields-pedal').classList.toggle('hidden', currentMode === 'delivery');
         };
@@ -595,63 +492,22 @@ async function saveShiftToFirebase(durationMs) {
 
         document.getElementById('form-activity').addEventListener('submit', async (e) => {
             e.preventDefault();
-            if(!auth.currentUser) return alert("Logue para salvar!");
-            
-            const data = {
-                mode: currentMode,
-                km: parseFloat(document.getElementById('in-km').value) || 0,
-                duration: parseFloat(document.getElementById('in-dur').value) || 0,
-                timestamp: Date.now()
-            };
-
-            if(currentMode === 'delivery') {
-                data.value = parseFloat(document.getElementById('in-val').value) || 0;
-                data.tip = parseFloat(document.getElementById('in-tip').value) || 0;
-                data.platform = document.getElementById('in-platform').value;
-            } else {
-                data.elevation = parseFloat(document.getElementById('in-elev').value) || 0;
-                data.feeling = document.getElementById('in-feeling').value;
-            }
-
+            if(!auth.currentUser) return;
+            const data = { mode: currentMode, km: parseFloat(document.getElementById('in-km').value), duration: parseFloat(document.getElementById('in-dur').value), timestamp: Date.now() };
+            if(currentMode === 'delivery') { data.value = parseFloat(document.getElementById('in-val').value); data.tip = parseFloat(document.getElementById('in-tip').value); data.platform = document.getElementById('in-platform').value; }
+            else { data.elevation = parseFloat(document.getElementById('in-elev').value); data.feeling = document.getElementById('in-feeling').value; }
             await addDoc(collection(db, `users/${auth.currentUser.uid}/activities`), data);
             closeModal();
             e.target.reset();
         });
 
-        window.saveGoals = async () => {
-            if(!auth.currentUser) return alert("Logue para salvar!");
-            goals = {
-                money: parseFloat(document.getElementById('goal-money-val').value) || 150,
-                km: parseFloat(document.getElementById('goal-km-val').value) || 40,
-                water: parseFloat(document.getElementById('goal-water-val').value) || 3000,
-                hours: parseFloat(document.getElementById('goal-hours-val').value) || 8
-            };
-            await setDoc(doc(db, `users/${auth.currentUser.uid}/config/goals`), goals);
-            alert("Metas salvas!");
-            updateUI();
-        };
-
-        function fillGoalInputs() {
-            document.getElementById('goal-money-val').value = goals.money;
-            document.getElementById('goal-km-val').value = goals.km;
-            document.getElementById('goal-water-val').value = goals.water;
-            document.getElementById('goal-hours-val').value = goals.hours;
-        }
-
-        function renderHistory() {
-            const container = document.getElementById('history-container');
-            container.innerHTML = activities.slice(0, 20).map(a => `
-                <div class="bento-card p-4 flex justify-between items-center">
-                    <div>
-                        <p class="text-[10px] font-black text-slate-500 uppercase">${a.type === 'water' ? 'Hidratação' : (a.mode === 'delivery' ? 'Entrega' : 'Pedal')}</p>
-                        <p class="font-bold">${a.type === 'water' ? a.amount + 'ml' : (a.mode === 'delivery' ? 'R$ ' + (a.value+a.tip).toFixed(2) : a.km + 'km')}</p>
-                    </div>
-                    <span class="text-[8px] font-bold text-slate-600">${new Date(a.timestamp).toLocaleTimeString([], {hour:'2-numeric', minute:'2-numeric'})}</span>
-                </div>
-            `).join('');
-        }
-
         window.addEventListener('DOMContentLoaded', () => {
+            const isRunning = localStorage.getItem('bikeFlow_timerRunning') === 'true';
+            if (isRunning) {
+                document.getElementById('timer-card').classList.add('timer-active');
+                document.getElementById('btn-timer-icon').innerHTML = '<i data-lucide="pause"></i>';
+                timerInterval = setInterval(refreshTimer, 1000);
+            }
             lucide.createIcons();
             setMode('delivery');
         });
