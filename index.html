@@ -9,7 +9,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         :root {
@@ -89,7 +88,6 @@
             border-color: var(--brand);
         }
 
-        /* Rank Badge */
         .rank-badge {
             background: linear-gradient(135deg, #10b981, #064e3b);
             color: #020617;
@@ -115,7 +113,7 @@
                         BIKEFLOW <span class="text-emerald-500">OS</span>
                         <span id="header-rank" class="rank-badge">LVL 1</span>
                     </h1>
-                    <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest" id="sync-status text-emerald-500">Iniciando...</p>
+                    <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest" id="sync-status">Iniciando...</p>
                 </div>
                 <div class="flex gap-2">
                     <button onclick="addWater()" class="h-10 w-10 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center border border-blue-500/20 active:scale-90 transition-transform">
@@ -156,7 +154,7 @@
 
             <!-- METAS -->
             <div class="bento-card p-6 space-y-4">
-                <h3 class="font-black text-[10px] uppercase tracking-widest text-slate-500">Metas do Dia</h3>
+                <h3 class="font-black text-[10px] uppercase tracking-widest text-slate-500">Metas do Dia (Geral)</h3>
                 <div class="space-y-4" id="goals-render"></div>
             </div>
 
@@ -191,28 +189,30 @@
         <div id="view-garage" class="view-content hidden space-y-6 text-center pt-20">
             <i data-lucide="wrench" class="mx-auto text-slate-700 mb-4" size="48"></i>
             <h2 class="text-lg font-black font-title uppercase">Módulo de Oficina</h2>
-            <p class="text-xs text-slate-500 uppercase font-bold tracking-widest">Implemente o registro de manutenção aqui</p>
+            <p class="text-xs text-slate-500 uppercase font-bold tracking-widest">Aba em desenvolvimento</p>
         </div>
 
         <!-- VIEW: METAS / PERFIL -->
         <div id="view-settings" class="view-content hidden space-y-6">
             <div class="bento-card p-8 text-center space-y-4">
-                <div id="profile-pic" class="h-20 w-20 bg-slate-800 rounded-2xl mx-auto border-2 border-brand overflow-hidden shadow-2xl"></div>
+                <div id="profile-pic" class="h-20 w-20 bg-slate-800 rounded-2xl mx-auto border-2 border-brand overflow-hidden shadow-2xl flex items-center justify-center">
+                    <i data-lucide="user" size="32"></i>
+                </div>
                 <h2 id="profile-name" class="font-black text-lg uppercase tracking-tight tracking-tighter">Visitante</h2>
                 <div id="profile-rank-info" class="text-brand font-black text-[10px] uppercase tracking-widest mt-2">Nível Novato</div>
                 <button onclick="loginGoogle()" id="btn-login" class="w-full py-4 bg-white text-black font-black rounded-xl text-xs uppercase tracking-widest">Entrar com Google</button>
-                <button onclick="handleLogout()" id="btn-logout" class="hidden w-full py-3 bg-red-500/10 text-red-500 font-black rounded-xl text-xs uppercase">Sair</button>
+                <button onclick="handleLogout()" id="btn-logout" class="hidden w-full py-3 bg-red-500/10 text-red-500 font-black rounded-xl text-xs uppercase">Sair da Conta</button>
             </div>
 
             <div class="bento-card p-6 space-y-4">
-                <h3 class="font-black uppercase text-[10px] tracking-widest text-slate-500 text-center">Definir Objetivos</h3>
+                <h3 class="font-black uppercase text-[10px] tracking-widest text-slate-500 text-center">Definir Objetivos Diários</h3>
                 <div class="grid grid-cols-2 gap-4">
                     <div><label class="text-[9px] font-black text-slate-500 uppercase mb-1 block">R$ Ganhos</label><input type="number" id="goal-money" class="goal-input font-bold"></div>
                     <div><label class="text-[9px] font-black text-slate-500 uppercase mb-1 block">KM Pedal</label><input type="number" id="goal-km" class="goal-input font-bold"></div>
                     <div><label class="text-[9px] font-black text-slate-500 uppercase mb-1 block">Água (ml)</label><input type="number" id="goal-water" class="goal-input font-bold"></div>
                     <div><label class="text-[9px] font-black text-slate-500 uppercase mb-1 block">Pausa (min)</label><input type="number" id="goal-pause" class="goal-input font-bold"></div>
                 </div>
-                <button onclick="saveGoals()" class="w-full py-4 btn-primary rounded-xl font-black uppercase text-[10px] tracking-widest">Salvar Metas</button>
+                <button onclick="saveGoals()" class="w-full py-4 btn-primary rounded-xl font-black uppercase text-[10px] tracking-widest">Salvar Minhas Metas</button>
             </div>
         </div>
     </main>
@@ -233,7 +233,7 @@
     <!-- MODAL ADICIONAR -->
     <div id="modal-add" class="fixed inset-0 bg-slate-950/95 hidden z-[300] flex items-center justify-center p-6">
         <div class="bento-card w-full max-w-sm p-8 space-y-6 border-brand/20 shadow-2xl">
-            <div class="flex justify-between items-center"><h2 class="text-xl font-black font-title uppercase tracking-tight" id="modal-title text-brand">Novo Corre</h2><button onclick="closeModal()" class="text-slate-500"><i data-lucide="x" size="20"></i></button></div>
+            <div class="flex justify-between items-center"><h2 class="text-xl font-black font-title uppercase tracking-tight" id="modal-title">Novo Corre</h2><button onclick="closeModal()" class="text-slate-500"><i data-lucide="x" size="20"></i></button></div>
             <form id="form-activity" class="space-y-4">
                 <input type="hidden" id="edit-id">
                 <div id="fields-delivery" class="space-y-4">
@@ -276,7 +276,6 @@
         import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, setDoc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { getAuth, signInWithRedirect, GoogleAuthProvider, onAuthStateChanged, signOut, getRedirectResult } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        // COLOQUE SUAS CHAVES DO FIREBASE AQUI
         const firebaseConfig = {
             apiKey: "AIzaSyAHWJevmj0dTechlviJIP6NRvmAfkySz8Y",
             authDomain: "bikeflowv1.firebaseapp.com",
@@ -296,20 +295,20 @@
         let goals = { money: 150, km: 40, water: 3000, pause: 60 };
         let historyFilter = 'all';
 
-        // AUTH
+        // AUTH GLOBALS
         window.loginGoogle = () => signInWithRedirect(auth, provider);
         window.handleLogout = () => signOut(auth);
 
         onAuthStateChanged(auth, async (user) => {
-            try { await getRedirectResult(auth); } catch (e) {}
+            const syncEl = document.getElementById('sync-status');
             if (user) {
                 document.getElementById('btn-login').classList.add('hidden');
                 document.getElementById('btn-logout').classList.remove('hidden');
                 document.getElementById('profile-name').innerText = user.displayName;
-                document.getElementById('profile-pic').style.backgroundImage = `url(${user.photoURL})`;
-                document.getElementById('profile-pic').style.backgroundSize = "cover";
+                document.getElementById('profile-pic').innerHTML = `<img src="${user.photoURL}" class="w-full h-full object-cover">`;
                 document.getElementById('user-avatar-header').innerHTML = `<img src="${user.photoURL}" class="w-full h-full object-cover">`;
-                document.getElementById('sync-status').innerText = "ONLINE";
+                syncEl.innerText = "ONLINE";
+                syncEl.classList.replace('text-slate-500', 'text-emerald-500');
                 
                 const gDoc = await getDoc(doc(db, `users/${user.uid}/config/goals`));
                 if(gDoc.exists()) { goals = gDoc.data(); updateGoalsForm(); }
@@ -317,21 +316,22 @@
             } else {
                 document.getElementById('btn-login').classList.remove('hidden');
                 document.getElementById('btn-logout').classList.add('hidden');
-                document.getElementById('sync-status').innerText = "OFFLINE";
+                syncEl.innerText = "OFFLINE";
+                activities = [];
                 renderHistory();
             }
         });
 
         function syncData(uid) {
-            onSnapshot(query(collection(db, `users/${uid}/activities`), orderBy("timestamp", "desc")), (snap) => {
+            const q = query(collection(db, `users/${uid}/activities`), orderBy("timestamp", "desc"));
+            onSnapshot(q, (snap) => {
                 activities = snap.docs.map(doc => ({id: doc.id, ...doc.data()}));
                 updateUI();
                 renderHistory();
             });
         }
 
-        // GAMIFICATION LOGIC
-        function updatePatente(totalKm) {
+        window.updatePatente = (totalKm) => {
             const ranks = [
                 { name: "Novato", min: 0, max: 50 },
                 { name: "Resistência", min: 50, max: 200 },
@@ -339,11 +339,9 @@
                 { name: "Elite Pro", min: 500, max: 1000 },
                 { name: "Mestre", min: 1000, max: Infinity }
             ];
-
             const currentRank = ranks.find(r => totalKm >= r.min && totalKm < r.max) || ranks[0];
             const nextRank = ranks[ranks.indexOf(currentRank) + 1];
-
-            // Update UI
+            
             document.getElementById('level-name').innerText = currentRank.name;
             document.getElementById('header-rank').innerText = `LVL ${ranks.indexOf(currentRank) + 1}`;
             document.getElementById('profile-rank-info').innerText = `Nível ${currentRank.name}`;
@@ -352,10 +350,7 @@
                 const diff = nextRank.min - currentRank.min;
                 const progress = ((totalKm - currentRank.min) / diff) * 100;
                 document.getElementById('level-bar').style.width = `${Math.min(100, progress)}%`;
-                document.getElementById('level-xp').innerText = `${Math.round(totalKm)} / ${nextRank.min} KM`;
-            } else {
-                document.getElementById('level-bar').style.width = "100%";
-                document.getElementById('level-xp').innerText = "NÍVEL MÁXIMO ATINGIDO";
+                document.getElementById('level-xp').innerText = `${Math.round(totalKm)} / ${nextRank.min} KM TOTAL`;
             }
         }
 
@@ -370,31 +365,31 @@
         };
 
         function updateUI() {
-            const todayStr = new Date().toLocaleDateString();
-            const tActs = activities.filter(a => new Date(a.timestamp).toLocaleDateString() === todayStr);
+            const todayStr = new Date().toLocaleDateString('pt-BR');
+            const tActs = activities.filter(a => new Date(a.timestamp).toLocaleDateString('pt-BR') === todayStr);
             const mActs = tActs.filter(a => a.mode === currentMode);
             
-            const km = mActs.reduce((acc, curr) => acc + (curr.km || 0), 0);
-            const dur = mActs.reduce((acc, curr) => acc + (curr.duration || 0), 0);
-            const totalKmAcc = activities.reduce((acc, curr) => acc + (curr.km || 0), 0);
-            
+            const totalKmAcc = activities.reduce((acc, curr) => acc + (Number(curr.km) || 0), 0);
             updatePatente(totalKmAcc);
+
+            const km = mActs.reduce((acc, curr) => acc + (Number(curr.km) || 0), 0);
+            const dur = mActs.reduce((acc, curr) => acc + (Number(curr.duration) || 0), 0);
             document.getElementById('val-km').innerText = `${km.toFixed(1)} km`;
 
             if(currentMode === 'delivery') {
-                const money = mActs.reduce((acc, c) => acc + (c.value||0) + (c.tip||0), 0);
+                const money = mActs.reduce((acc, c) => acc + (Number(c.value)||0) + (Number(c.tip)||0), 0);
                 document.getElementById('val-primary').innerText = `R$ ${money.toFixed(2)}`;
                 document.getElementById('val-secondary').innerText = mActs.length;
                 document.getElementById('val-pace').innerText = (money/(dur/60||1)).toFixed(2) + "/h";
             } else {
-                const elev = mActs.reduce((acc, c) => acc + (c.elevation||0), 0);
+                const elev = mActs.reduce((acc, c) => acc + (Number(c.elevation)||0), 0);
                 document.getElementById('val-primary').innerText = `${elev}m`;
                 document.getElementById('val-secondary').innerText = mActs.length;
                 document.getElementById('val-pace').innerText = (km/(dur/60||1)).toFixed(1) + "km/h";
             }
 
-            const water = tActs.filter(a => a.type === 'water').reduce((acc, c) => acc + (c.amount||0), 0);
-            const pauses = tActs.filter(a => a.type === 'break').reduce((acc, c) => acc + (c.duration||0), 0);
+            const water = tActs.filter(a => a.type === 'water').reduce((acc, c) => acc + (Number(c.amount)||0), 0);
+            const pauses = tActs.filter(a => a.type === 'break').reduce((acc, c) => acc + (Number(c.duration)||0), 0);
             document.getElementById('val-water').innerText = `${water}ml`;
             document.getElementById('val-pauses').innerText = `${pauses}m`;
 
@@ -402,12 +397,28 @@
         }
 
         function renderProgress(tActs) {
-            const money = tActs.filter(a => a.mode === 'delivery').reduce((acc, c) => acc + (c.value||0) + (c.tip||0), 0);
-            const km = tActs.filter(a => a.mode === 'pedal').reduce((acc, curr) => acc + (curr.km || 0), 0);
-            const gList = [{ label: 'Meta de Fretes', curr: money, target: goals.money, color: 'emerald' }, { label: 'Meta KM Pedal', curr: km, target: goals.km, color: 'blue' }];
+            const money = tActs.filter(a => a.mode === 'delivery').reduce((acc, c) => acc + (Number(c.value)||0) + (Number(c.tip)||0), 0);
+            const km = tActs.filter(a => a.mode === 'pedal').reduce((acc, curr) => acc + (Number(curr.km) || 0), 0);
+            const water = tActs.filter(a => a.type === 'water').reduce((acc, c) => acc + (Number(c.amount)||0), 0);
+
+            const gList = [
+                { label: 'Ganhos', curr: money, target: goals.money, color: 'emerald' },
+                { label: 'Pedal KM', curr: km, target: goals.km, color: 'blue' },
+                { label: 'Hidratação', curr: water, target: goals.water, color: 'cyan' }
+            ];
+
             document.getElementById('goals-render').innerHTML = gList.map(g => {
-                const pct = Math.min(100, (g.curr/g.target)*100);
-                return `<div class="space-y-1"><div class="flex justify-between text-[8px] font-black uppercase text-slate-500 tracking-wider"><span>${g.label}</span><span>${Math.round(pct)}%</span></div><div class="h-1.5 bg-slate-800 rounded-full overflow-hidden border border-white/5"><div class="h-full bg-${g.color}-500 transition-all duration-1000" style="width: ${pct}%"></div></div></div>`;
+                const pct = Math.min(100, (g.curr/g.target)*100) || 0;
+                return `
+                <div class="space-y-1">
+                    <div class="flex justify-between text-[8px] font-black uppercase text-slate-500 tracking-wider">
+                        <span>${g.label}</span>
+                        <span>${Math.round(pct)}%</span>
+                    </div>
+                    <div class="h-1.5 bg-slate-800 rounded-full overflow-hidden border border-white/5">
+                        <div class="h-full bg-${g.color}-500 transition-all duration-700" style="width: ${pct}%"></div>
+                    </div>
+                </div>`;
             }).join('');
         }
 
@@ -418,7 +429,7 @@
             renderHistory();
         };
 
-        function renderHistory() {
+        window.renderHistory = () => {
             const container = document.getElementById('history-grouped-container');
             if(!auth.currentUser) { container.innerHTML = `<p class="p-20 text-center opacity-30 uppercase font-black text-xs tracking-widest">Faça Login para ver o Histórico</p>`; return; }
             
@@ -431,13 +442,13 @@
             }
 
             const grouped = filtered.reduce((acc, curr) => {
-                const date = new Date(curr.timestamp).toLocaleDateString();
+                const date = new Date(curr.timestamp).toLocaleDateString('pt-BR');
                 if(!acc[date]) acc[date] = []; acc[date].push(curr); return acc;
             }, {});
 
             container.innerHTML = Object.keys(grouped).map(date => `
                 <div class="space-y-4">
-                    <div class="border-b border-white/5 pb-2 text-[10px] font-black text-slate-500 uppercase tracking-widest">${date === new Date().toLocaleDateString() ? 'HOJE' : date}</div>
+                    <div class="border-b border-white/5 pb-2 text-[10px] font-black text-slate-500 uppercase tracking-widest">${date === new Date().toLocaleDateString('pt-BR') ? 'HOJE' : date}</div>
                     <div class="space-y-2">
                         ${grouped[date].map(a => `
                             <div onclick="editActivity('${a.id}')" class="bento-card p-4 flex justify-between items-center active:scale-95 transition-all cursor-pointer">
@@ -446,7 +457,9 @@
                                         <i data-lucide="${a.type==='water'?'droplet':(a.type==='break'?'coffee':(a.mode==='delivery'?'package':'bike'))}" size="16"></i>
                                     </div>
                                     <div>
-                                        <p class="font-bold text-sm mb-0.5 leading-none">${a.type==='water'?a.amount+'ml':(a.type==='break'?a.label:(a.mode==='delivery'?'R$ '+(a.value+a.tip).toFixed(2):a.km+'km'))}</p>
+                                        <p class="font-bold text-sm mb-0.5 leading-none">
+                                            ${a.type==='water'? a.amount+'ml' : (a.type==='break'? a.label : (a.mode==='delivery' ? 'R$ '+ (Number(a.value)+Number(a.tip)).toFixed(2) : a.km+'km'))}
+                                        </p>
                                         <p class="text-[8px] font-black text-slate-600 uppercase">${a.km||0}km • ${a.duration||0}m • ${new Date(a.timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</p>
                                     </div>
                                 </div>
@@ -500,8 +513,14 @@
                 duration: parseFloat(document.getElementById('in-dur').value)||0,
                 timestamp: id ? activities.find(i=>i.id===id).timestamp : Date.now()
             };
-            if(currentMode==='delivery'){data.value=parseFloat(document.getElementById('in-val').value)||0; data.tip=parseFloat(document.getElementById('in-tip').value)||0; data.platform=document.getElementById('in-platform').value;}
-            else{data.elevation=parseFloat(document.getElementById('in-elev').value)||0; data.feeling=document.getElementById('in-feeling').value;}
+            if(currentMode==='delivery'){
+                data.value=parseFloat(document.getElementById('in-val').value)||0; 
+                data.tip=parseFloat(document.getElementById('in-tip').value)||0; 
+                data.platform=document.getElementById('in-platform').value;
+            } else {
+                data.elevation=parseFloat(document.getElementById('in-elev').value)||0; 
+                data.feeling=document.getElementById('in-feeling').value;
+            }
             if(id) await updateDoc(doc(db,`users/${auth.currentUser.uid}/activities/${id}`), data);
             else await addDoc(collection(db,`users/${auth.currentUser.uid}/activities`), data);
             closeModal(); e.target.reset();
@@ -510,24 +529,66 @@
         document.getElementById('form-break').addEventListener('submit', async (e) => {
             e.preventDefault();
             const id = document.getElementById('edit-break-id').value;
-            const data = { type:'break', label: document.getElementById('in-break-label').value, duration: parseFloat(document.getElementById('in-break-dur').value), timestamp: id? activities.find(i=>i.id===id).timestamp : Date.now() };
+            const data = { 
+                type:'break', 
+                label: document.getElementById('in-break-label').value, 
+                duration: parseFloat(document.getElementById('in-break-dur').value), 
+                timestamp: id? activities.find(i=>i.id===id).timestamp : Date.now() 
+            };
             if(id) await updateDoc(doc(db,`users/${auth.currentUser.uid}/activities/${id}`), data);
             else await addDoc(collection(db, `users/${auth.currentUser.uid}/activities`), data);
             closeBreakModal(); e.target.reset();
         });
 
         window.addWater = async () => {
-            if(!auth.currentUser) return;
+            if(!auth.currentUser) return alert("Acesse sua conta para salvar");
             await addDoc(collection(db,`users/${auth.currentUser.uid}/activities`),{type:'water', amount: 300, timestamp: Date.now()});
         };
 
-        window.openModal = () => { document.getElementById('edit-id').value=""; document.getElementById('btn-delete-activity').classList.add('hidden'); document.getElementById('modal-add').classList.remove('hidden'); document.getElementById('modal-title').innerText=currentMode==='delivery'?'Novo Corre':'Novo Pedal'; document.getElementById('fields-delivery').classList.toggle('hidden', currentMode!=='delivery'); document.getElementById('fields-pedal').classList.toggle('hidden', currentMode==='delivery'); };
+        window.openModal = () => { 
+            if(!auth.currentUser) return alert("Acesse sua conta primeiro");
+            document.getElementById('edit-id').value=""; 
+            document.getElementById('btn-delete-activity').classList.add('hidden'); 
+            document.getElementById('modal-add').classList.remove('hidden'); 
+            document.getElementById('modal-title').innerText=currentMode==='delivery'?'Novo Corre':'Novo Pedal'; 
+            document.getElementById('fields-delivery').classList.toggle('hidden', currentMode!=='delivery'); 
+            document.getElementById('fields-pedal').classList.toggle('hidden', currentMode==='delivery'); 
+        };
+
         window.closeModal = () => document.getElementById('modal-add').classList.add('hidden');
-        window.openBreakModal = () => { document.getElementById('edit-break-id').value=""; document.getElementById('modal-break').classList.remove('hidden'); };
+        window.openBreakModal = () => { 
+            if(!auth.currentUser) return alert("Acesse sua conta");
+            document.getElementById('edit-break-id').value=""; 
+            document.getElementById('modal-break').classList.remove('hidden'); 
+        };
         window.closeBreakModal = () => document.getElementById('modal-break').classList.add('hidden');
-        window.showView = (v) => { document.querySelectorAll('.view-content').forEach(el=>el.classList.add('hidden')); document.getElementById(`view-${v}`).classList.remove('hidden'); document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active')); document.getElementById(`nav-${v}`).classList.add('active'); if(v==='history')renderHistory(); lucide.createIcons(); };
-        window.saveGoals = async () => { goals = { money: parseFloat(document.getElementById('goal-money').value), km: parseFloat(document.getElementById('goal-km').value), water: parseFloat(document.getElementById('goal-water').value), pause: parseFloat(document.getElementById('goal-pause').value) }; await setDoc(doc(db,`users/${auth.currentUser.uid}/config/goals`), goals); alert("Salvo!"); updateUI(); };
-        function updateGoalsForm() { document.getElementById('goal-money').value=goals.money; document.getElementById('goal-km').value=goals.km; document.getElementById('goal-water').value=goals.water; document.getElementById('goal-pause').value=goals.pause||60; }
+        
+        window.showView = (v) => { 
+            document.querySelectorAll('.view-content').forEach(el=>el.classList.add('hidden')); 
+            document.getElementById(`view-${v}`).classList.remove('hidden'); 
+            document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active')); 
+            document.getElementById(`nav-${v}`).classList.add('active'); 
+            if(v==='history') renderHistory(); 
+            lucide.createIcons(); 
+        };
+
+        window.saveGoals = async () => { 
+            goals = { 
+                money: parseFloat(document.getElementById('goal-money').value), 
+                km: parseFloat(document.getElementById('goal-km').value), 
+                water: parseFloat(document.getElementById('goal-water').value), 
+                pause: parseFloat(document.getElementById('goal-pause').value) 
+            }; 
+            await setDoc(doc(db,`users/${auth.currentUser.uid}/config/goals`), goals); 
+            alert("Metas Salvas!"); updateUI(); 
+        };
+
+        function updateGoalsForm() { 
+            document.getElementById('goal-money').value=goals.money; 
+            document.getElementById('goal-km').value=goals.km; 
+            document.getElementById('goal-water').value=goals.water; 
+            document.getElementById('goal-pause').value=goals.pause||60; 
+        }
         
         window.addEventListener('DOMContentLoaded', () => {
             lucide.createIcons();
